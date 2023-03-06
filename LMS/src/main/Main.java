@@ -18,6 +18,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
+
 import javax.swing.ImageIcon;
 import java.awt.CardLayout;
 import javax.swing.JComboBox;
@@ -28,6 +29,21 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JRadioButton;
+import java.awt.CardLayout;
+import javax.swing.JInternalFrame;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTabbedPane;
+import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.SpringLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.EtchedBorder;
+
 
 public class Main extends JFrame {
 
@@ -64,7 +80,9 @@ public class Main extends JFrame {
 		setEnabled(false);
 		setTitle("Library Management System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		setBounds(100, 100, 685, 473);
+
 		mainPanel = new JPanel();
 		mainPanel.setBackground(new Color(0, 0, 0));
 		mainPanel.setForeground(SystemColor.text);
@@ -72,8 +90,7 @@ public class Main extends JFrame {
 
 		setContentPane(mainPanel);
 		mainPanel.setLayout(new CardLayout(0, 0));
-		
-		JPanel Login = new JPanel();
+JPanel Login = new JPanel();
 		Login.setBorder(new LineBorder(new Color(255, 163, 79), 0, true));
 		Login.setBackground(new Color(0, 0, 0));
 		Login.setForeground(new Color(128, 255, 0));
@@ -309,9 +326,5 @@ public class Main extends JFrame {
 		JPanel ActivityLogsPanel = new JPanel();
 		ActivityLogsPanel.setBackground(new Color(192, 192, 192));
 		panel_2.add(ActivityLogsPanel, "name_72247065996200");
-		
-		
-		
-		
 	}
 }
