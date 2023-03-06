@@ -4,6 +4,7 @@ public class Client {
 	
 	private String clientName, clientEmail, clientPassword;
 	private int clientID, clientBDay, clientBMonth, clientBYear;
+	private int clientType = 0;
 	
 	
 	
@@ -22,7 +23,18 @@ public class Client {
 	
 	
 	
-	
+	public String getClientPassword() {
+		return clientPassword;
+	}
+	public void setClientPassword(String clientPassword) {
+		this.clientPassword = clientPassword;
+	}
+	public int getClientType() {
+		return clientType;
+	}
+	public void setClientType(int clientType) {
+		this.clientType = clientType;
+	}
 	public String getClientName() {
 		return clientName;
 	}
