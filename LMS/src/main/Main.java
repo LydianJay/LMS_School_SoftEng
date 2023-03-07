@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JTextPane;
 import java.awt.FlowLayout;
@@ -21,6 +23,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
 import java.awt.CardLayout;
 import javax.swing.JComboBox;
@@ -46,6 +49,7 @@ import javax.swing.SpringLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.MaskFormatter;
 import javax.swing.border.EtchedBorder;
 
 import java.sql.Connection;
@@ -54,7 +58,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Random;
 
+import javax.swing.JFormattedTextField;
+import javax.swing.JList;
+import javax.swing.JScrollBar;
+import user.Client;
 
 public class Main extends JFrame implements ActionListener {
 	
@@ -63,11 +73,12 @@ public class Main extends JFrame implements ActionListener {
 	private static String dtbUrl = "jdbc:mysql://localhost:3306/lms_database", dtbUsername = "root", dtbPassword = "";
 	private static Connection dtbConn;
 	private static CardLayout crdMain = new CardLayout();
+	private static ArrayList<JCheckBox> chkBoxUsermng = new ArrayList<JCheckBox>();
+	
 	
 	private static int currentHomeCntIdx = 0; // current panel number for the homepage
 	private JButton btnLogin;
 	private JPasswordField pfieldPassword;
-	private JTextField tfieldUserID;
 	private JPanel mainPanel;
 	private JButton btnRegisterSelection;
 	private JPanel rightContentPanel;
@@ -88,7 +99,16 @@ public class Main extends JFrame implements ActionListener {
 	private JTextField tfieldPassRegis;
 	private ButtonGroup g2;
 	private ButtonGroup g1;
-	
+	private JFormattedTextField ftFieldUserID;
+	private MaskFormatter maskFUserID;
+	private JTextField tFieldUsermngUserName;
+	private JFormattedTextField fTFieldUsermngUserID;
+	private JButton btnUsermngSearch;
+	private JButton btnUserManagement;
+	private JPanel scrPanelUsermng;
+	private JButton btnUsermngShowAll;
+	private JButton btnUsermngUnregis;
+	private JButton btnUsermngModify;
 	
 	
 	
@@ -103,6 +123,9 @@ public class Main extends JFrame implements ActionListener {
 	}
 	
 	
+	
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub0
@@ -110,7 +133,7 @@ public class Main extends JFrame implements ActionListener {
 		if(b == btnLogin) {
 			
 			
-			int userId = Integer.valueOf(tfieldUserID.getText());
+			int userId = Integer.valueOf(ftFieldUserID.getText());
 			String userPass = new String(pfieldPassword.getPassword());
 		
 			try {
@@ -177,16 +200,12 @@ public class Main extends JFrame implements ActionListener {
 			
 			boolean isValid = !(userName.isEmpty() && address.isEmpty() && email.isBlank() && bday.isBlank() && conNum.isBlank() && password.isBlank() && gender.isBlank() && role.isBlank());
 			
-			System.out.println("username: " + userName.isEmpty()); System.out.println("addr: " + address.isEmpty()); System.out.println("email: " + email.isBlank());
-			System.out.println("bday: " +  bday.isBlank()); System.out.println("conNum: " + conNum.isBlank()); System.out.println("password: " + password.isBlank());
-			
-			System.out.println("gender: " +  gender.isBlank() ); System.out.println("role: " + role.isBlank());
 			
 			if(isValid) {
 				
 				
 				
-				String userID = bday;
+				String userID = this.tFieldYearRegis.getText() + String.valueOf(new Random().nextInt(999999));
 				boolean isSuccess = true;
 				try {
 					Statement st = dtbConn.createStatement();
@@ -221,9 +240,161 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		
+		else if(b == this.btnUserManagement) {
+			movePanel(PNL_USER_MNG);
+		}
+		else if(b == this.btnUsermngSearch) {
+			sectionUserManagement();
+		}
+		else if(b == this.btnUsermngShowAll) {
+			sectionUserManagementShowAll();
+		}
+		
+		else if(b == this.btnUsermngUnregis) {
+			sectionUserManagementUnregis();
+		}
+		
+	}
+	
+	private void sectionUserManagementUnregis() {
+		
+		
+		if(JOptionPane.showConfirmDialog(this,"Are you sure?", "DELETE USER",
+	               JOptionPane.YES_NO_OPTION,
+	               JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) return;
+		
+		
+		boolean success = true;
+		for(JCheckBox j : chkBoxUsermng) {
+			
+			if(j.isSelected()) {
+				
+				try {
+					Statement st = dtbConn.createStatement();
+					String userName;
+					int idx = j.getText().indexOf("Name:") + 7;
+					userName = "'" + j.getText().substring(idx) + "'";
+					String stm = "DELETE FROM `userinfo` WHERE userName = " + userName;
+					st.executeUpdate(stm);
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					success = false;
+					e.printStackTrace();
+				}
+				
+				
+			}
+			
+			
+		}
+		if(success) JOptionPane.showMessageDialog(this, "Deleted Successfuly!"); else JOptionPane.showMessageDialog(this, "Delete Failed!");
+		scrPanelUsermng.removeAll();
+		this.scrPanelUsermng.revalidate();
+		chkBoxUsermng.clear();
+	}
+	
+	
+	
+	private void sectionUserManagement() {
+		
+		String userName = "'" + this.tFieldUsermngUserName.getText() + "%'";
+		String userID = this.fTFieldUsermngUserID.getText();
+		
+		
+		this.scrPanelUsermng.removeAll();
+		this.scrPanelUsermng.revalidate();
+		//ArrayList<Client> clients = new ArrayList<Client>();
+		Statement st;
+		try {
+			st = dtbConn.createStatement();
+			
+			if(userID.isEmpty() == false && userID.compareTo("0000000000") != 0) {
+				chkBoxUsermng.clear();
+
+				String stm = "SELECT * FROM `userinfo` WHERE userID = " + userID;
+				ResultSet r = st.executeQuery(stm);
+				
+				while(r.next()) {
+					
+					String parsed = "UserID:  " + r.getString("userID") + " Name:  " + r.getString("userName");
+					JCheckBox j = new JCheckBox(parsed);
+					
+					chkBoxUsermng.add(j);
+					this.scrPanelUsermng.add(j);
+				}
+				
+				
+			}
+			else if(!userName.isEmpty()) {
+				chkBoxUsermng.clear();
+				String stm = "SELECT * FROM `userinfo` WHERE userName LIKE " + userName;
+				ResultSet r = st.executeQuery(stm);
+				
+				while(r.next()) {
+					
+					String parsed = "UserID:  " + r.getString("userID") + " Name:  " + r.getString("userName");
+					JCheckBox j = new JCheckBox(parsed);
+					chkBoxUsermng.add(j);
+					this.scrPanelUsermng.add(j);
+				}
+				
+				
+				
+			}
+			
+			this.scrPanelUsermng.revalidate();
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+		
 		
 		
 	}
+	
+	
+	
+	
+	
+	
+	private void sectionUserManagementShowAll() {
+		Statement st;
+		try {
+			chkBoxUsermng.clear();
+			this.scrPanelUsermng.removeAll();
+			this.scrPanelUsermng.revalidate();
+			
+			st = dtbConn.createStatement();
+			String stm = "SELECT * FROM `userinfo`";
+			ResultSet r = st.executeQuery(stm);
+			
+			while(r.next()) {
+				
+				String parsed = "UserID:  " + r.getString("userID") + " Name:  " + r.getString("userName");
+				JCheckBox j = new JCheckBox(parsed);
+				chkBoxUsermng.add(j);
+				this.scrPanelUsermng.add(j);
+			}
+			
+			this.scrPanelUsermng.revalidate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	
+	
+	
+	
 	
 	/**
 	 * Launch the application.
@@ -265,7 +436,16 @@ public class Main extends JFrame implements ActionListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setBounds(100, 100, 685, 473);
-
+		
+		
+		try {
+			this.maskFUserID = new MaskFormatter("##########");
+			this.maskFUserID.setPlaceholderCharacter('0');
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		mainPanel = new JPanel();
 		mainPanel.setBackground(new Color(0, 0, 0));
 		mainPanel.setForeground(SystemColor.text);
@@ -315,10 +495,15 @@ public class Main extends JFrame implements ActionListener {
 		
 		panel.add(btnLogin);
 		
-		tfieldUserID = new JTextField();
-		tfieldUserID.setBounds(127, 55, 146, 20);
-		panel.add(tfieldUserID);
-		tfieldUserID.setColumns(10);
+		
+		
+		ftFieldUserID = new JFormattedTextField(maskFUserID);
+		ftFieldUserID.setBounds(127, 55, 146, 20);
+		ftFieldUserID.setColumns(10);
+		
+		
+		
+		panel.add(ftFieldUserID);
 		
 		HomeScreen = new JPanel();
 		HomeScreen.setBackground(new Color(128, 128, 128));
@@ -331,41 +516,42 @@ public class Main extends JFrame implements ActionListener {
 		HomeScreen.add(leftContentPanel);
 		leftContentPanel.setLayout(null);
 		
-		JToggleButton tglbtnNewToggleButton = new JToggleButton("Search / Rent");
-		tglbtnNewToggleButton.setBounds(10, 11, 176, 53);
-		tglbtnNewToggleButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(tglbtnNewToggleButton);
-		
-		JToggleButton tglbtnNewToggleButton_1 = new JToggleButton("Return");
-		tglbtnNewToggleButton_1.setBounds(10, 70, 176, 47);
-		tglbtnNewToggleButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(tglbtnNewToggleButton_1);
-		
-		JToggleButton tglbtnNewToggleButton_2 = new JToggleButton("User Information");
-		tglbtnNewToggleButton_2.setBounds(10, 128, 176, 47);
-		tglbtnNewToggleButton_2.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(tglbtnNewToggleButton_2);
-		
-		JToggleButton tglbtnNewToggleButton_3 = new JToggleButton("User Management");
-		tglbtnNewToggleButton_3.setBounds(10, 186, 176, 47);
-		tglbtnNewToggleButton_3.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(tglbtnNewToggleButton_3);
-		
-		JToggleButton tglbtnNewToggleButton_4 = new JToggleButton("Book Management");
-		tglbtnNewToggleButton_4.setBounds(10, 244, 176, 53);
-		tglbtnNewToggleButton_4.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(tglbtnNewToggleButton_4);
-		
-		JToggleButton tglbtnNewToggleButton_6 = new JToggleButton("Activity Logs");
-		tglbtnNewToggleButton_6.setBounds(10, 366, 176, 47);
-		tglbtnNewToggleButton_6.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(tglbtnNewToggleButton_6);
-		
 		btnRegisterSelection = new JButton("Register");
 		btnRegisterSelection.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnRegisterSelection.setBounds(10, 308, 176, 47);
 		btnRegisterSelection.addActionListener(this);
 		leftContentPanel.add(btnRegisterSelection);
+		
+		JButton btnBookManagement = new JButton("Book Management");
+		btnBookManagement.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnBookManagement.setBounds(10, 244, 176, 47);
+		leftContentPanel.add(btnBookManagement);
+		
+		btnUserManagement = new JButton("User Management");
+		btnUserManagement.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnUserManagement.setBounds(10, 186, 176, 47);
+		btnUserManagement.addActionListener(this);
+		leftContentPanel.add(btnUserManagement);
+		
+		JButton btnUserInformation = new JButton("User Information");
+		btnUserInformation.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnUserInformation.setBounds(10, 128, 176, 47);
+		leftContentPanel.add(btnUserInformation);
+		
+		JButton btnReturn = new JButton("Return");
+		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnReturn.setBounds(10, 70, 176, 47);
+		leftContentPanel.add(btnReturn);
+		
+		JButton btnSeachrent = new JButton("Seach/Rent");
+		btnSeachrent.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnSeachrent.setBounds(10, 11, 176, 47);
+		leftContentPanel.add(btnSeachrent);
+		
+		JButton btnActivityLogs = new JButton("Activity Logs");
+		btnActivityLogs.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnActivityLogs.setBounds(10, 366, 176, 47);
+		leftContentPanel.add(btnActivityLogs);
 		
 		rightContentPanel = new JPanel();
 		rightContentPanel.setBounds(199, 0, 460, 424);
@@ -387,6 +573,67 @@ public class Main extends JFrame implements ActionListener {
 		JPanel UserManagementPanel = new JPanel();
 		UserManagementPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(UserManagementPanel, "name_72229635802400");
+		UserManagementPanel.setLayout(null);
+		
+		JLabel lblNewLabel_3 = new JLabel("UserID");
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNewLabel_3.setBounds(10, 11, 46, 14);
+		UserManagementPanel.add(lblNewLabel_3);
+		
+		fTFieldUsermngUserID = new JFormattedTextField(this.maskFUserID);
+		fTFieldUsermngUserID.setBounds(54, 8, 115, 20);
+		UserManagementPanel.add(fTFieldUsermngUserID);
+		
+		JLabel lblNewLabel_4 = new JLabel("User Name");
+		lblNewLabel_4.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNewLabel_4.setBounds(179, 11, 61, 14);
+		UserManagementPanel.add(lblNewLabel_4);
+		
+		tFieldUsermngUserName = new JTextField();
+		tFieldUsermngUserName.setBounds(250, 8, 115, 20);
+		UserManagementPanel.add(tFieldUsermngUserName);
+		tFieldUsermngUserName.setColumns(10);
+		
+		btnUsermngSearch = new JButton("Search");
+		btnUsermngSearch.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnUsermngSearch.setBounds(10, 49, 95, 29);
+		btnUsermngSearch.addActionListener(this);
+		UserManagementPanel.add(btnUsermngSearch);
+		
+		
+		
+		scrPanelUsermng = new JPanel();
+		scrPanelUsermng.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.GRAY, null, null, null));
+		scrPanelUsermng.setBackground(Color.WHITE);
+		
+		
+		
+		JScrollPane scrollPane = new JScrollPane(scrPanelUsermng);
+		scrollPane.setViewportBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setBounds(10, 120, 267, 293);
+		UserManagementPanel.add(scrollPane);
+		scrollPane.setViewportView(scrPanelUsermng);
+		scrPanelUsermng.setLayout(new BoxLayout(scrPanelUsermng, BoxLayout.Y_AXIS));
+		
+		btnUsermngUnregis = new JButton("UNREGISTER");
+		btnUsermngUnregis.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnUsermngUnregis.setBounds(304, 120, 115, 29);
+		btnUsermngUnregis.addActionListener(this);
+		UserManagementPanel.add(btnUsermngUnregis);
+		
+		btnUsermngShowAll = new JButton("Show All");
+		btnUsermngShowAll.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnUsermngShowAll.setBounds(126, 49, 114, 29);
+		btnUsermngShowAll.addActionListener(this);
+		UserManagementPanel.add(btnUsermngShowAll);
+		
+		btnUsermngModify = new JButton("MODIFY");
+		btnUsermngModify.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnUsermngModify.setBounds(304, 160, 115, 29);
+		UserManagementPanel.add(btnUsermngModify);
+		//scrPanelUsermng.setBounds(scrollPane.getBounds());
+		
 		
 		JPanel BookManagementPanel = new JPanel();
 		BookManagementPanel.setBackground(new Color(192, 192, 192));
@@ -529,4 +776,7 @@ public class Main extends JFrame implements ActionListener {
 		ActivityLogsPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(ActivityLogsPanel, "name_72247065996200");
 	}
+
+
+	
 }
