@@ -27,6 +27,8 @@ import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -84,6 +86,8 @@ public class Main extends JFrame implements ActionListener {
 	private JTextField tFieldYearRegis;
 	private JTextField tFieldConRegis;
 	private JTextField tfieldPassRegis;
+	private ButtonGroup g2;
+	private ButtonGroup g1;
 	
 	
 	
@@ -167,12 +171,17 @@ public class Main extends JFrame implements ActionListener {
 			bday = this.tFieldDateRegis.getText() + this.tFieldMonthRegis.getText() + this.tFieldYearRegis.getText();
 			conNum = "'" + this.tFieldConRegis.getText() + "'";
 			password = "'" + this.tfieldPassRegis.getText() + "'";
-			gender = this.rdbtnMale.isSelected() ? "1" : "0";
-			gender = this.rdbtnFemale.isSelected() ? "0" : "1";
-			role = this.rdbtnAdmin.isSelected() ? "1" : "0";
-			role = this.rdbtnClient.isSelected() ? "0" : "1";
+			gender = this.rdbtnMale.isSelected() ? "1" : this.rdbtnFemale.isSelected() ? "0" : "1";
+			role = this.rdbtnAdmin.isSelected() ? "1" : this.rdbtnClient.isSelected() ? "0" : "1";
 			
-			boolean isValid = userName.isBlank() && address.isBlank() && email.isBlank() && bday.isBlank() && conNum.isBlank() && password.isBlank() && gender.isBlank() && role.isBlank();
+			
+			boolean isValid = !(userName.isEmpty() && address.isEmpty() && email.isBlank() && bday.isBlank() && conNum.isBlank() && password.isBlank() && gender.isBlank() && role.isBlank());
+			
+			System.out.println("username: " + userName.isEmpty()); System.out.println("addr: " + address.isEmpty()); System.out.println("email: " + email.isBlank());
+			System.out.println("bday: " +  bday.isBlank()); System.out.println("conNum: " + conNum.isBlank()); System.out.println("password: " + password.isBlank());
+			
+			System.out.println("gender: " +  gender.isBlank() ); System.out.println("role: " + role.isBlank());
+			
 			if(isValid) {
 				
 				
@@ -187,12 +196,16 @@ public class Main extends JFrame implements ActionListener {
 					
 				} catch (SQLException e1) {
 					isSuccess = false;
-					// TODO Auto-generated catch block
+					
 					JOptionPane.showMessageDialog(this, "Failed");
+					
 					
 				}
 				if(isSuccess) {
 					JOptionPane.showMessageDialog(this, "Registration Success!");
+					this.tFieldNameRegis.setText(""); this.tFieldAddrRegis.setText(""); this.tFieldEmailRegis.setText(""); this.tFieldDateRegis.setText(""); this.tFieldMonthRegis.setText("");
+					this.tFieldYearRegis.setText(""); this.tFieldConRegis.setText(""); this.tfieldPassRegis.setText("");
+					g1.clearSelection(); g2.clearSelection();
 					movePanel(PNL_SEARCH);
 				}
 				
@@ -425,12 +438,17 @@ public class Main extends JFrame implements ActionListener {
 		tFieldConRegis.setColumns(10);
 		
 		rdbtnMale = new JRadioButton("Male");
-		rdbtnMale.setBounds(134, 329, 59, 23);
+		rdbtnMale.setBounds(134, 329, 72, 23);
 		RegisterPanel.add(rdbtnMale);
 		
 		rdbtnFemale = new JRadioButton("Female");
-		rdbtnFemale.setBounds(195, 329, 59, 23);
+		rdbtnFemale.setBounds(133, 355, 73, 23);
 		RegisterPanel.add(rdbtnFemale);
+		
+		g1 = new ButtonGroup(); 
+		g1.add(rdbtnFemale); 
+		g1.add(rdbtnMale);  
+		
 		
 		JLabel lblNewLabel_2 = new JLabel("Name");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -475,12 +493,16 @@ public class Main extends JFrame implements ActionListener {
 		RegisterPanel.add(lblNewLabel_13);
 		
 		rdbtnAdmin = new JRadioButton("Admin");
-		rdbtnAdmin.setBounds(292, 329, 59, 23);
+		rdbtnAdmin.setBounds(292, 329, 80, 23);
 		RegisterPanel.add(rdbtnAdmin);
 		
 		rdbtnClient = new JRadioButton("Client");
-		rdbtnClient.setBounds(353, 329, 59, 23);
+		rdbtnClient.setBounds(292, 355, 80, 23);
 		RegisterPanel.add(rdbtnClient);
+		g2 = new ButtonGroup();
+		g2.add(rdbtnAdmin);
+		g2.add(rdbtnClient);
+		
 		
 		JLabel lblNewLabel_14 = new JLabel("Role");
 		lblNewLabel_14.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -489,7 +511,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		btnRegistration = new JButton("Register");
 		btnRegistration.setFont(new Font("Tahoma", Font.BOLD, 14));
-		btnRegistration.setBounds(194, 377, 103, 36);
+		btnRegistration.setBounds(194, 385, 103, 28);
 		btnRegistration.addActionListener(this);
 		RegisterPanel.add(btnRegistration);
 		
