@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,8 +66,15 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JList;
 import javax.swing.JScrollBar;
 import user.Client;
+import ui.UIBookManagement;
+import ui.UIRenting;
+import ui.UIReturn;
 
 public class Main extends JFrame implements ActionListener {
+	
+	private static UIBookManagement bookManagmentUI = new UIBookManagement();
+	private static UIRenting uiRenting = new UIRenting();
+	private static UIReturn uiReturn = new UIReturn();
 	
 	private static final int PNL_SEARCH = 0, PNL_RETURN = 1, PNL_USER_INFO = 2, PNL_USER_MNG = 3, PNL_BOOK_MNG = 4, PNL_REGIS = 5, PNL_LOG = 6;
 	
@@ -109,6 +117,11 @@ public class Main extends JFrame implements ActionListener {
 	private JButton btnUsermngShowAll;
 	private JButton btnUsermngUnregis;
 	private JButton btnUsermngModify;
+	private JTextField textField_1;
+	private JTextField textField_2;
+	private JButton btnBookManagement;
+	private JButton btnSeachrent;
+	private JButton btnReturn;
 	
 	
 	
@@ -243,6 +256,18 @@ public class Main extends JFrame implements ActionListener {
 		else if(b == this.btnUserManagement) {
 			movePanel(PNL_USER_MNG);
 		}
+		else if(b == this.btnBookManagement) {
+			movePanel(PNL_BOOK_MNG);
+		}
+		else if(b == this.btnSeachrent) {
+			movePanel(PNL_SEARCH);
+		}
+		else if(b == this.btnReturn) {
+			movePanel(PNL_RETURN);
+		}
+		
+		
+		
 		else if(b == this.btnUsermngSearch) {
 			sectionUserManagement();
 		}
@@ -396,6 +421,7 @@ public class Main extends JFrame implements ActionListener {
 	
 	
 	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -407,10 +433,17 @@ public class Main extends JFrame implements ActionListener {
 		try {
 			
 			dtbConn = DriverManager.getConnection(dtbUrl, dtbUsername, dtbPassword);
+			uiRenting.dtbConn = dtbConn;
+			uiReturn.dtbConn = dtbConn;
+			
 			
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		
+		
+		
 		
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -424,12 +457,19 @@ public class Main extends JFrame implements ActionListener {
 				}
 			}
 		});
+		
+		
+		
+		
 	}
 
 	/**
 	 * Create the frame.
 	 */
+	@SuppressWarnings("static-access")
 	public Main() {
+		bookManagmentUI.windowRef = this;
+		
 		setResizable(false);
 		setEnabled(true);
 		setTitle("Library Management System");
@@ -522,7 +562,7 @@ public class Main extends JFrame implements ActionListener {
 		btnRegisterSelection.addActionListener(this);
 		leftContentPanel.add(btnRegisterSelection);
 		
-		JButton btnBookManagement = new JButton("Book Management");
+		btnBookManagement = new JButton("Book Management"); btnBookManagement.addActionListener(this);
 		btnBookManagement.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnBookManagement.setBounds(10, 244, 176, 47);
 		leftContentPanel.add(btnBookManagement);
@@ -538,12 +578,12 @@ public class Main extends JFrame implements ActionListener {
 		btnUserInformation.setBounds(10, 128, 176, 47);
 		leftContentPanel.add(btnUserInformation);
 		
-		JButton btnReturn = new JButton("Return");
+		btnReturn = new JButton("Return"); btnReturn.addActionListener(this);
 		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnReturn.setBounds(10, 70, 176, 47);
 		leftContentPanel.add(btnReturn);
 		
-		JButton btnSeachrent = new JButton("Seach/Rent");
+		btnSeachrent = new JButton("Seach/Rent"); btnSeachrent.addActionListener(this);
 		btnSeachrent.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnSeachrent.setBounds(10, 11, 176, 47);
 		leftContentPanel.add(btnSeachrent);
@@ -561,14 +601,213 @@ public class Main extends JFrame implements ActionListener {
 		JPanel SearchRentPanel = new JPanel();
 		SearchRentPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(SearchRentPanel, "name_72204072661900");
+		SearchRentPanel.setLayout(null);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane_1.setBounds(10, 87, 440, 133);
+		SearchRentPanel.add(scrollPane_1);
+		
+		JPanel panel_2 = new JPanel(); uiRenting.panel1 = panel_2;
+		scrollPane_1.setViewportView(panel_2);
+		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
+		
+		JLabel lblNewLabel_15 = new JLabel("Book Name");
+		lblNewLabel_15.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_15.setBounds(10, 11, 78, 14);
+		SearchRentPanel.add(lblNewLabel_15);
+		
+		JTextField textField = new JTextField(); uiRenting.tfBookName = textField;
+		textField.setBounds(86, 9, 131, 20);
+		SearchRentPanel.add(textField);
+		textField.setColumns(10);
+		
+		JLabel lblNewLabel_20 = new JLabel("Category");
+		lblNewLabel_20.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_20.setBounds(10, 36, 67, 14);
+		SearchRentPanel.add(lblNewLabel_20);
+		
+		JTextField textField_3 = new JTextField(); uiRenting.tfCategory = textField_3;
+		textField_3.setBounds(86, 34, 131, 20);
+		SearchRentPanel.add(textField_3);
+		textField_3.setColumns(10);
+		
+		JLabel lblNewLabel_21 = new JLabel("Author");
+		lblNewLabel_21.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_21.setBounds(10, 62, 67, 14);
+		SearchRentPanel.add(lblNewLabel_21);
+		
+		JTextField textField_4 = new JTextField(); uiRenting.tfAuthor = textField_4;
+		textField_4.setBounds(86, 60, 131, 20);
+		SearchRentPanel.add(textField_4);
+		textField_4.setColumns(10);
+		
+		JButton btnNewButton_4 = new JButton("SEARCH"); uiRenting.btnSearch = btnNewButton_4;
+		btnNewButton_4.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_4.setBounds(250, 7, 89, 23);
+		SearchRentPanel.add(btnNewButton_4);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane_2.setBounds(10, 260, 440, 116);
+		SearchRentPanel.add(scrollPane_2);
+		
+		JPanel panel_3 = new JPanel(); uiRenting.panel2 = panel_3;
+		scrollPane_2.setViewportView(panel_3);
+		panel_3.setLayout(new BoxLayout(panel_3, BoxLayout.Y_AXIS));
+		uiRenting.windowRef = this;
+		
+		JLabel lblNewLabel_22 = new JLabel("Book To Rent");
+		lblNewLabel_22.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_22.setBounds(184, 231, 89, 14);
+		SearchRentPanel.add(lblNewLabel_22);
+		
+		JButton btnNewButton_5 = new JButton("ADD"); uiRenting.btnAdd = btnNewButton_5;
+		btnNewButton_5.setBackground(Color.DARK_GRAY);
+		btnNewButton_5.setForeground(Color.BLACK);
+		btnNewButton_5.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_5.setBounds(349, 8, 89, 23);
+		SearchRentPanel.add(btnNewButton_5);
+		
+		JButton btnNewButton_6 = new JButton("REMOVE"); uiRenting.btnRemove = btnNewButton_6;
+		btnNewButton_6.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_6.setBounds(349, 387, 89, 36);
+		SearchRentPanel.add(btnNewButton_6);
+		
+		JButton btnNewButton_7 = new JButton("CONFIRM"); uiRenting.btnConfirm = btnNewButton_7;
+		btnNewButton_7.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_7.setBounds(228, 387, 105, 36);
+		SearchRentPanel.add(btnNewButton_7);
+		
+		JLabel lblNewLabel_23 = new JLabel("UserID");
+		lblNewLabel_23.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_23.setBounds(10, 392, 55, 26);
+		SearchRentPanel.add(lblNewLabel_23);
+		
+		JFormattedTextField formattedTextField_3 = new JFormattedTextField(uiRenting.idFormatter); uiRenting.ftfUserID = formattedTextField_3;
+		formattedTextField_3.setBounds(54, 396, 116, 20);
+		SearchRentPanel.add(formattedTextField_3);
 		
 		JPanel ReturnPanel = new JPanel();
 		ReturnPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(ReturnPanel, "name_72224483657400");
+		ReturnPanel.setLayout(null);
+		
+		JLabel lblNewLabel_24 = new JLabel("UserID");
+		lblNewLabel_24.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_24.setBounds(10, 21, 49, 19);
+		ReturnPanel.add(lblNewLabel_24);
+		
+		
+		JFormattedTextField formattedTextField_2 = new JFormattedTextField(uiReturn.idFormatter); uiReturn.ftfID = formattedTextField_2;
+		formattedTextField_2.setBounds(57, 21, 119, 20);
+		ReturnPanel.add(formattedTextField_2);
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		scrollPane_3.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane_3.setBounds(10, 144, 440, 269);
+		ReturnPanel.add(scrollPane_3);
+		
+		JPanel panel_4 = new JPanel(); uiReturn.panel = panel_4;
+		scrollPane_3.setViewportView(panel_4);
+		panel_4.setLayout(new BoxLayout(panel_4, BoxLayout.Y_AXIS));
+		
+		JButton btnNewButton_8 = new JButton("ENTER"); uiReturn.btnEnter = btnNewButton_8;
+		btnNewButton_8.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_8.setBounds(206, 19, 89, 23);
+		ReturnPanel.add(btnNewButton_8);
+		
+		JButton btnNewButton_9 = new JButton("RETURN"); uiReturn.btnReturn = btnNewButton_9;
+		btnNewButton_9.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_9.setBounds(361, 110, 89, 23);
+		ReturnPanel.add(btnNewButton_9);
 		
 		JPanel UserInformationPanel = new JPanel();
 		UserInformationPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(UserInformationPanel, "name_72227231251400");
+		UserInformationPanel.setLayout(null);
+		
+		JLabel lblNewLabel_25 = new JLabel("UserID");
+		lblNewLabel_25.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_25.setBounds(10, 11, 46, 14);
+		UserInformationPanel.add(lblNewLabel_25);
+		
+		JFormattedTextField formattedTextField_4 = new JFormattedTextField();
+		formattedTextField_4.setBounds(61, 9, 124, 20);
+		UserInformationPanel.add(formattedTextField_4);
+		
+		JButton btnNewButton_10 = new JButton("ENTER");
+		btnNewButton_10.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_10.setBounds(211, 8, 89, 23);
+		UserInformationPanel.add(btnNewButton_10);
+		
+		JLabel lblNewLabel_26 = new JLabel("Name:");
+		lblNewLabel_26.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_26.setBounds(10, 68, 46, 20);
+		UserInformationPanel.add(lblNewLabel_26);
+		
+		JLabel lblNewLabel_27 = new JLabel(""); 
+		lblNewLabel_27.setOpaque(true);
+		lblNewLabel_27.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_27.setBounds(93, 68, 129, 20);
+		UserInformationPanel.add(lblNewLabel_27);
+		
+		JLabel lblNewLabel_28 = new JLabel("Address:");
+		lblNewLabel_28.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_28.setBounds(10, 105, 61, 20);
+		UserInformationPanel.add(lblNewLabel_28);
+		
+		JLabel lblNewLabel_29 = new JLabel("Email:");
+		lblNewLabel_29.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_29.setBounds(10, 136, 40, 14);
+		UserInformationPanel.add(lblNewLabel_29);
+		
+		JLabel lblNewLabel_30 = new JLabel("Contact No.");
+		lblNewLabel_30.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_30.setBounds(10, 184, 89, 14);
+		UserInformationPanel.add(lblNewLabel_30);
+		
+		JLabel lblNewLabel_31 = new JLabel("Gender:");
+		lblNewLabel_31.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_31.setBounds(10, 215, 61, 14);
+		UserInformationPanel.add(lblNewLabel_31);
+		
+		JLabel lblNewLabel_32 = new JLabel("Role:");
+		lblNewLabel_32.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_32.setBounds(254, 215, 46, 14);
+		UserInformationPanel.add(lblNewLabel_32);
+		
+		JLabel lblNewLabel_33 = new JLabel(""); lblNewLabel_33.setOpaque(true);
+		lblNewLabel_33.setBounds(93, 105, 129, 20);
+		UserInformationPanel.add(lblNewLabel_33);
+		
+		JLabel lblNewLabel_33_1 = new JLabel("");
+		lblNewLabel_33_1.setOpaque(true);
+		lblNewLabel_33_1.setBounds(93, 140, 129, 20);
+		UserInformationPanel.add(lblNewLabel_33_1);
+		
+		JLabel lblNewLabel_33_1_1 = new JLabel("");
+		lblNewLabel_33_1_1.setOpaque(true);
+		lblNewLabel_33_1_1.setBounds(93, 178, 129, 20);
+		UserInformationPanel.add(lblNewLabel_33_1_1);
+		
+		JLabel lblNewLabel_33_1_2 = new JLabel("");
+		lblNewLabel_33_1_2.setOpaque(true);
+		lblNewLabel_33_1_2.setBounds(93, 209, 129, 20);
+		UserInformationPanel.add(lblNewLabel_33_1_2);
+		
+		JLabel lblNewLabel_33_1_3 = new JLabel("");
+		lblNewLabel_33_1_3.setOpaque(true);
+		lblNewLabel_33_1_3.setBounds(304, 209, 129, 20);
+		UserInformationPanel.add(lblNewLabel_33_1_3);
+		
+		JScrollPane scrollPane_4 = new JScrollPane();
+		scrollPane_4.setBounds(10, 240, 440, 173);
+		UserInformationPanel.add(scrollPane_4);
+		
+		JPanel panel_5 = new JPanel();
+		scrollPane_4.setViewportView(panel_5);
+		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
 		
 		JPanel UserManagementPanel = new JPanel();
 		UserManagementPanel.setBackground(new Color(192, 192, 192));
@@ -638,6 +877,99 @@ public class Main extends JFrame implements ActionListener {
 		JPanel BookManagementPanel = new JPanel();
 		BookManagementPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(BookManagementPanel, "name_72232200085800");
+		BookManagementPanel.setLayout(null);
+		
+		bookManagmentUI.dtbConn = this.dtbConn;
+		
+		JPanel panel_1 = new JPanel(); bookManagmentUI.panel = panel_1;
+		
+		
+		JScrollPane scrollPaneBookMng = new JScrollPane(panel_1); bookManagmentUI.scrollPane = scrollPaneBookMng;
+		scrollPaneBookMng.setBounds(10, 160, 440, 253);
+		BookManagementPanel.add(scrollPaneBookMng);
+		
+		
+		
+		scrollPaneBookMng.setViewportView(panel_1);
+		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
+		
+		JLabel lblNewLabel_5 = new JLabel("ID");
+		lblNewLabel_5.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_5.setBounds(10, 38, 46, 14);
+		BookManagementPanel.add(lblNewLabel_5);
+		
+		JFormattedTextField formattedTextField = new JFormattedTextField(bookManagmentUI.idFormatter); bookManagmentUI.ftfID = formattedTextField;
+		formattedTextField.setBounds(93, 36, 132, 20);
+		BookManagementPanel.add(formattedTextField);
+		
+		JLabel lblBookMgnName = new JLabel("Name");
+		lblBookMgnName.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblBookMgnName.setBounds(10, 11, 73, 14);
+		BookManagementPanel.add(lblBookMgnName);
+		
+		JTextField txtFieldNameBookMng = new JTextField(); bookManagmentUI.tfName = txtFieldNameBookMng;
+		txtFieldNameBookMng.setBounds(93, 5, 132, 20);
+		BookManagementPanel.add(txtFieldNameBookMng);
+		txtFieldNameBookMng.setColumns(10);
+		
+		JLabel lblNewLabel_16 = new JLabel("Category"); 
+		lblNewLabel_16.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_16.setBounds(10, 67, 73, 14);
+		BookManagementPanel.add(lblNewLabel_16);
+		
+		textField_1 = new JTextField(); bookManagmentUI.tfCategory = textField_1;
+		textField_1.setBounds(93, 65, 132, 20);
+		BookManagementPanel.add(textField_1);
+		textField_1.setColumns(10);
+		
+		JLabel lblNewLabel_17 = new JLabel("Author");
+		lblNewLabel_17.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_17.setBounds(10, 94, 46, 14);
+		BookManagementPanel.add(lblNewLabel_17);
+		
+		textField_2 = new JTextField(); bookManagmentUI.tfAuthor = textField_2;
+		textField_2.setBounds(93, 92, 132, 20);
+		BookManagementPanel.add(textField_2);
+		textField_2.setColumns(10);
+		
+		JLabel lblNewLabel_18 = new JLabel("Year");
+		lblNewLabel_18.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_18.setBounds(10, 120, 73, 14);
+		BookManagementPanel.add(lblNewLabel_18);
+		
+		JFormattedTextField formattedTextField_1 = new JFormattedTextField(bookManagmentUI.yearFormatter); bookManagmentUI.ftfYear = formattedTextField_1;
+		formattedTextField_1.setBounds(93, 118, 132, 20);
+		BookManagementPanel.add(formattedTextField_1);
+		
+		JButton btnNewButton = new JButton("CREATE"); bookManagmentUI.btnCreate = btnNewButton;
+		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton.setBounds(348, 7, 89, 23);
+		BookManagementPanel.add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("DELETE"); bookManagmentUI.btnDelete = btnNewButton_1;
+		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_1.setBounds(235, 77, 89, 23);
+		BookManagementPanel.add(btnNewButton_1);
+		
+		JButton btnNewButton_2 = new JButton("SEARCH"); bookManagmentUI.btnSearch = btnNewButton_2;
+		btnNewButton_2.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_2.setBounds(235, 8, 89, 23);
+		BookManagementPanel.add(btnNewButton_2);
+		
+		JLabel lblNewLabel_19 = new JLabel("QTY:"); 
+		lblNewLabel_19.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_19.setBounds(235, 116, 46, 23);
+		BookManagementPanel.add(lblNewLabel_19);
+		
+		JButton btnNewButton_3 = new JButton("ADD"); bookManagmentUI.btnAdd = btnNewButton_3;
+		btnNewButton_3.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_3.setBounds(273, 117, 82, 20);
+		BookManagementPanel.add(btnNewButton_3);
+		
+		JButton btnNewButton_3_1 = new JButton("SUB"); bookManagmentUI.btnSubtract = btnNewButton_3_1;
+		btnNewButton_3_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNewButton_3_1.setBounds(368, 117, 82, 20);
+		BookManagementPanel.add(btnNewButton_3_1);
 		
 		RegisterPanel = new JPanel();
 		RegisterPanel.setBackground(new Color(192, 192, 192));
@@ -775,8 +1107,11 @@ public class Main extends JFrame implements ActionListener {
 		JPanel ActivityLogsPanel = new JPanel();
 		ActivityLogsPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(ActivityLogsPanel, "name_72247065996200");
+		
+		uiReturn.windowRef = this;
+		
+		bookManagmentUI.initActionListener();
+		uiRenting.initActionResponse();
+		uiReturn.initActionResponse();
 	}
-
-
-	
 }
