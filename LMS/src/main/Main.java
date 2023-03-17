@@ -69,12 +69,16 @@ import user.Client;
 import ui.UIBookManagement;
 import ui.UIRenting;
 import ui.UIReturn;
+import ui.UIUserInfo;
+import ui.UIUserRegistration;
 
 public class Main extends JFrame implements ActionListener {
 	
 	private static UIBookManagement bookManagmentUI = new UIBookManagement();
 	private static UIRenting uiRenting = new UIRenting();
 	private static UIReturn uiReturn = new UIReturn();
+	private static UIUserInfo uiUserInfo = new UIUserInfo();
+	private static UIUserRegistration uiUserRegis = new UIUserRegistration();
 	
 	private static final int PNL_SEARCH = 0, PNL_RETURN = 1, PNL_USER_INFO = 2, PNL_USER_MNG = 3, PNL_BOOK_MNG = 4, PNL_REGIS = 5, PNL_LOG = 6;
 	
@@ -84,7 +88,6 @@ public class Main extends JFrame implements ActionListener {
 	private static ArrayList<JCheckBox> chkBoxUsermng = new ArrayList<JCheckBox>();
 	
 	
-	private static int currentHomeCntIdx = 0; // current panel number for the homepage
 	private JButton btnLogin;
 	private JPasswordField pfieldPassword;
 	private JPanel mainPanel;
@@ -93,20 +96,8 @@ public class Main extends JFrame implements ActionListener {
 	private JPanel HomeScreen;
 	private JRadioButton rdbtnFemale;
 	private JRadioButton rdbtnMale;
-	private JRadioButton rdbtnAdmin;
-	private JRadioButton rdbtnClient;
 	private JButton btnRegistration;
 	private JPanel RegisterPanel;
-	private JTextField tFieldNameRegis;
-	private JTextField tFieldAddrRegis;
-	private JTextField tFieldEmailRegis;
-	private JTextField tFieldDateRegis;
-	private JTextField tFieldMonthRegis;
-	private JTextField tFieldYearRegis;
-	private JTextField tFieldConRegis;
-	private JTextField tfieldPassRegis;
-	private ButtonGroup g2;
-	private ButtonGroup g1;
 	private JFormattedTextField ftFieldUserID;
 	private MaskFormatter maskFUserID;
 	private JTextField tFieldUsermngUserName;
@@ -122,6 +113,7 @@ public class Main extends JFrame implements ActionListener {
 	private JButton btnBookManagement;
 	private JButton btnSeachrent;
 	private JButton btnReturn;
+	private JButton btnUserInformation;
 	
 	
 	
@@ -176,7 +168,6 @@ public class Main extends JFrame implements ActionListener {
 				}
 				
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			
@@ -184,71 +175,8 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		else if(b == this.btnRegisterSelection) {
-			
 			CardLayout c = (CardLayout)(this.rightContentPanel.getLayout());
-			
 			movePanel(PNL_REGIS);
-			currentHomeCntIdx = 5;
-			
-			
-		}
-		
-		
-		else if(b == this.btnRegistration) {
-			
-			String userName, address, email,bday,conNum, password, gender, role;
-			
-			
-			
-			
-			userName = "'" + this.tFieldNameRegis.getText() + "'";
-			address = "'" + this.tFieldAddrRegis.getText() + "'";
-			email = "'" + this.tFieldEmailRegis.getText() + "'";
-			bday = this.tFieldDateRegis.getText() + this.tFieldMonthRegis.getText() + this.tFieldYearRegis.getText();
-			conNum = "'" + this.tFieldConRegis.getText() + "'";
-			password = "'" + this.tfieldPassRegis.getText() + "'";
-			gender = this.rdbtnMale.isSelected() ? "1" : this.rdbtnFemale.isSelected() ? "0" : "1";
-			role = this.rdbtnAdmin.isSelected() ? "1" : this.rdbtnClient.isSelected() ? "0" : "1";
-			
-			
-			boolean isValid = !(userName.isEmpty() && address.isEmpty() && email.isBlank() && bday.isBlank() && conNum.isBlank() && password.isBlank() && gender.isBlank() && role.isBlank());
-			
-			
-			if(isValid) {
-				
-				
-				
-				String userID = this.tFieldYearRegis.getText() + String.valueOf(new Random().nextInt(999999));
-				boolean isSuccess = true;
-				try {
-					Statement st = dtbConn.createStatement();
-					String str = "INSERT INTO userinfo VALUES (" + userName + "," + address + "," + email + "," + bday + "," + conNum + "," + gender + "," + role + "," + userID + "," + password + ");";
-					st.executeUpdate(str);
-					
-					
-				} catch (SQLException e1) {
-					isSuccess = false;
-					
-					JOptionPane.showMessageDialog(this, "Failed");
-					
-					
-				}
-				if(isSuccess) {
-					JOptionPane.showMessageDialog(this, "Registration Success!");
-					this.tFieldNameRegis.setText(""); this.tFieldAddrRegis.setText(""); this.tFieldEmailRegis.setText(""); this.tFieldDateRegis.setText(""); this.tFieldMonthRegis.setText("");
-					this.tFieldYearRegis.setText(""); this.tFieldConRegis.setText(""); this.tfieldPassRegis.setText("");
-					g1.clearSelection(); g2.clearSelection();
-					movePanel(PNL_SEARCH);
-				}
-				
-			}
-			else {
-				JOptionPane.showMessageDialog(this, "Empty Fields Detected!!!");
-			}
-			
-			
-			
-			
 		}
 		
 		
@@ -266,7 +194,9 @@ public class Main extends JFrame implements ActionListener {
 			movePanel(PNL_RETURN);
 		}
 		
-		
+		else if(b == this.btnUserInformation) {
+			movePanel(PNL_USER_INFO);
+		}
 		
 		else if(b == this.btnUsermngSearch) {
 			sectionUserManagement();
@@ -435,7 +365,8 @@ public class Main extends JFrame implements ActionListener {
 			dtbConn = DriverManager.getConnection(dtbUrl, dtbUsername, dtbPassword);
 			uiRenting.dtbConn = dtbConn;
 			uiReturn.dtbConn = dtbConn;
-			
+			uiUserInfo.dtbConn = dtbConn;
+			uiUserRegis.dtbConn = dtbConn;
 			
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -469,6 +400,8 @@ public class Main extends JFrame implements ActionListener {
 	@SuppressWarnings("static-access")
 	public Main() {
 		bookManagmentUI.windowRef = this;
+		uiUserInfo.windowRef = this;
+		uiUserRegis.windowRef = this;
 		
 		setResizable(false);
 		setEnabled(true);
@@ -573,7 +506,7 @@ public class Main extends JFrame implements ActionListener {
 		btnUserManagement.addActionListener(this);
 		leftContentPanel.add(btnUserManagement);
 		
-		JButton btnUserInformation = new JButton("User Information");
+		btnUserInformation = new JButton("User Information"); btnUserInformation.addActionListener(this);
 		btnUserInformation.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnUserInformation.setBounds(10, 128, 176, 47);
 		leftContentPanel.add(btnUserInformation);
@@ -663,7 +596,7 @@ public class Main extends JFrame implements ActionListener {
 		SearchRentPanel.add(lblNewLabel_22);
 		
 		JButton btnNewButton_5 = new JButton("ADD"); uiRenting.btnAdd = btnNewButton_5;
-		btnNewButton_5.setBackground(Color.DARK_GRAY);
+		btnNewButton_5.setBackground(Color.WHITE);
 		btnNewButton_5.setForeground(Color.BLACK);
 		btnNewButton_5.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_5.setBounds(349, 8, 89, 23);
@@ -722,7 +655,7 @@ public class Main extends JFrame implements ActionListener {
 		btnNewButton_9.setBounds(361, 110, 89, 23);
 		ReturnPanel.add(btnNewButton_9);
 		
-		JPanel UserInformationPanel = new JPanel();
+		JPanel UserInformationPanel = new JPanel(); 
 		UserInformationPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(UserInformationPanel, "name_72227231251400");
 		UserInformationPanel.setLayout(null);
@@ -732,11 +665,11 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_25.setBounds(10, 11, 46, 14);
 		UserInformationPanel.add(lblNewLabel_25);
 		
-		JFormattedTextField formattedTextField_4 = new JFormattedTextField();
+		JFormattedTextField formattedTextField_4 = new JFormattedTextField(uiReturn.idFormatter); uiUserInfo.ftfID = formattedTextField_4;
 		formattedTextField_4.setBounds(61, 9, 124, 20);
 		UserInformationPanel.add(formattedTextField_4);
 		
-		JButton btnNewButton_10 = new JButton("ENTER");
+		JButton btnNewButton_10 = new JButton("ENTER"); uiUserInfo.btnEnter = btnNewButton_10; uiUserInfo.initActionResponse();
 		btnNewButton_10.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_10.setBounds(211, 8, 89, 23);
 		UserInformationPanel.add(btnNewButton_10);
@@ -746,7 +679,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_26.setBounds(10, 68, 46, 20);
 		UserInformationPanel.add(lblNewLabel_26);
 		
-		JLabel lblNewLabel_27 = new JLabel(""); 
+		JLabel lblNewLabel_27 = new JLabel(""); uiUserInfo.tfName = lblNewLabel_27;
 		lblNewLabel_27.setOpaque(true);
 		lblNewLabel_27.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblNewLabel_27.setBounds(93, 68, 129, 20);
@@ -777,26 +710,26 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_32.setBounds(254, 215, 46, 14);
 		UserInformationPanel.add(lblNewLabel_32);
 		
-		JLabel lblNewLabel_33 = new JLabel(""); lblNewLabel_33.setOpaque(true);
+		JLabel lblNewLabel_33 = new JLabel(""); lblNewLabel_33.setOpaque(true); uiUserInfo.tfAddress = lblNewLabel_33;
 		lblNewLabel_33.setBounds(93, 105, 129, 20);
 		UserInformationPanel.add(lblNewLabel_33);
 		
-		JLabel lblNewLabel_33_1 = new JLabel("");
+		JLabel lblNewLabel_33_1 = new JLabel(""); uiUserInfo.tfEmail = lblNewLabel_33_1;
 		lblNewLabel_33_1.setOpaque(true);
 		lblNewLabel_33_1.setBounds(93, 140, 129, 20);
 		UserInformationPanel.add(lblNewLabel_33_1);
 		
-		JLabel lblNewLabel_33_1_1 = new JLabel("");
+		JLabel lblNewLabel_33_1_1 = new JLabel(""); uiUserInfo.tfContactNo = lblNewLabel_33_1_1;
 		lblNewLabel_33_1_1.setOpaque(true);
 		lblNewLabel_33_1_1.setBounds(93, 178, 129, 20);
 		UserInformationPanel.add(lblNewLabel_33_1_1);
 		
-		JLabel lblNewLabel_33_1_2 = new JLabel("");
+		JLabel lblNewLabel_33_1_2 = new JLabel(""); uiUserInfo.tfGender = lblNewLabel_33_1_2;
 		lblNewLabel_33_1_2.setOpaque(true);
 		lblNewLabel_33_1_2.setBounds(93, 209, 129, 20);
 		UserInformationPanel.add(lblNewLabel_33_1_2);
 		
-		JLabel lblNewLabel_33_1_3 = new JLabel("");
+		JLabel lblNewLabel_33_1_3 = new JLabel(""); uiUserInfo.tfRole = lblNewLabel_33_1_3;
 		lblNewLabel_33_1_3.setOpaque(true);
 		lblNewLabel_33_1_3.setBounds(304, 209, 129, 20);
 		UserInformationPanel.add(lblNewLabel_33_1_3);
@@ -805,7 +738,7 @@ public class Main extends JFrame implements ActionListener {
 		scrollPane_4.setBounds(10, 240, 440, 173);
 		UserInformationPanel.add(scrollPane_4);
 		
-		JPanel panel_5 = new JPanel();
+		JPanel panel_5 = new JPanel(); uiUserInfo.panel = panel_5;
 		scrollPane_4.setViewportView(panel_5);
 		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
 		
@@ -981,52 +914,30 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_1.setBounds(134, 0, 176, 43);
 		RegisterPanel.add(lblNewLabel_1);
 		
-		tFieldNameRegis = new JTextField();
+		JTextField tFieldNameRegis = new JTextField(); uiUserRegis.tfName = tFieldNameRegis;
 		tFieldNameRegis.setBounds(134, 54, 278, 20);
 		RegisterPanel.add(tFieldNameRegis);
 		tFieldNameRegis.setColumns(10);
 		
-		tFieldAddrRegis = new JTextField();
+		JTextField tFieldAddrRegis = new JTextField(); uiUserRegis.tfAddress = tFieldAddrRegis;
 		tFieldAddrRegis.setBounds(134, 100, 278, 20);
 		RegisterPanel.add(tFieldAddrRegis);
 		tFieldAddrRegis.setColumns(10);
 		
-		tFieldEmailRegis = new JTextField();
+		JTextField tFieldEmailRegis = new JTextField(); uiUserRegis.tfEmail = tFieldEmailRegis;
 		tFieldEmailRegis.setBounds(134, 147, 278, 20);
 		RegisterPanel.add(tFieldEmailRegis);
 		tFieldEmailRegis.setColumns(10);
 		
-		tFieldDateRegis = new JTextField();
-		tFieldDateRegis.setBounds(134, 192, 86, 20);
-		RegisterPanel.add(tFieldDateRegis);
-		tFieldDateRegis.setColumns(10);
-		
-		tFieldMonthRegis = new JTextField();
-		tFieldMonthRegis.setBounds(230, 192, 86, 20);
-		RegisterPanel.add(tFieldMonthRegis);
-		tFieldMonthRegis.setColumns(10);
-		
-		tFieldYearRegis = new JTextField();
-		tFieldYearRegis.setBounds(326, 192, 86, 20);
-		RegisterPanel.add(tFieldYearRegis);
-		tFieldYearRegis.setColumns(10);
-		
-		tFieldConRegis = new JTextField();
-		tFieldConRegis.setBounds(134, 240, 278, 20);
-		RegisterPanel.add(tFieldConRegis);
-		tFieldConRegis.setColumns(10);
-		
-		rdbtnMale = new JRadioButton("Male");
+		rdbtnMale = new JRadioButton("Male"); uiUserRegis.rbMale = rdbtnMale; uiUserRegis.bgGender.add(rdbtnMale);
 		rdbtnMale.setBounds(134, 329, 72, 23);
 		RegisterPanel.add(rdbtnMale);
 		
-		rdbtnFemale = new JRadioButton("Female");
+		rdbtnFemale = new JRadioButton("Female"); uiUserRegis.rbMale = rdbtnMale; uiUserRegis.bgGender.add(rdbtnFemale);
 		rdbtnFemale.setBounds(133, 355, 73, 23);
 		RegisterPanel.add(rdbtnFemale);
 		
-		g1 = new ButtonGroup(); 
-		g1.add(rdbtnFemale); 
-		g1.add(rdbtnMale);  
+		
 		
 		
 		JLabel lblNewLabel_2 = new JLabel("Name");
@@ -1071,16 +982,14 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_13.setBounds(134, 308, 96, 14);
 		RegisterPanel.add(lblNewLabel_13);
 		
-		rdbtnAdmin = new JRadioButton("Admin");
+		JRadioButton rdbtnAdmin = new JRadioButton("Admin"); uiUserRegis.rbAdmin = rdbtnAdmin; uiUserRegis.bgRole.add(rdbtnAdmin);
 		rdbtnAdmin.setBounds(292, 329, 80, 23);
 		RegisterPanel.add(rdbtnAdmin);
 		
-		rdbtnClient = new JRadioButton("Client");
+		JRadioButton rdbtnClient = new JRadioButton("Client"); uiUserRegis.rbClient = rdbtnClient; uiUserRegis.bgRole.add(rdbtnClient);
 		rdbtnClient.setBounds(292, 355, 80, 23);
 		RegisterPanel.add(rdbtnClient);
-		g2 = new ButtonGroup();
-		g2.add(rdbtnAdmin);
-		g2.add(rdbtnClient);
+		
 		
 		
 		JLabel lblNewLabel_14 = new JLabel("Role");
@@ -1088,10 +997,9 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_14.setBounds(292, 307, 46, 14);
 		RegisterPanel.add(lblNewLabel_14);
 		
-		btnRegistration = new JButton("Register");
+		btnRegistration = new JButton("Register"); uiUserRegis.btnRegister = btnRegistration; btnRegistration.addActionListener(uiUserRegis);
 		btnRegistration.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnRegistration.setBounds(194, 385, 103, 28);
-		btnRegistration.addActionListener(this);
 		RegisterPanel.add(btnRegistration);
 		
 		JLabel lblNewLabel = new JLabel("Password");
@@ -1099,16 +1007,33 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel.setBounds(39, 271, 103, 20);
 		RegisterPanel.add(lblNewLabel);
 		
-		tfieldPassRegis = new JTextField();
+		JTextField tfieldPassRegis = new JTextField(); uiUserRegis.tfPass = tfieldPassRegis;
 		tfieldPassRegis.setBounds(134, 272, 278, 20);
 		RegisterPanel.add(tfieldPassRegis);
 		tfieldPassRegis.setColumns(10);
+		
+		JFormattedTextField formattedTextField_5 = new JFormattedTextField(uiUserRegis.dateFormatter); uiUserRegis.ftfDate = formattedTextField_5;
+		formattedTextField_5.setBounds(134, 196, 59, 20);
+		RegisterPanel.add(formattedTextField_5);
+		
+		JFormattedTextField formattedTextField_5_1 = new JFormattedTextField(uiUserRegis.monthFormatter); uiUserRegis.ftfMonth = formattedTextField_5_1;
+		formattedTextField_5_1.setBounds(217, 196, 59, 20);
+		RegisterPanel.add(formattedTextField_5_1);
+		
+		JFormattedTextField formattedTextField_5_1_1 = new JFormattedTextField(uiUserRegis.yearFormatter); uiUserRegis.ftfYear = formattedTextField_5_1_1;
+		formattedTextField_5_1_1.setBounds(300, 196, 72, 20);
+		RegisterPanel.add(formattedTextField_5_1_1);
+		
+		JFormattedTextField formattedTextField_5_1_2 = new JFormattedTextField(uiUserRegis.contactNoFormatter); uiUserRegis.ftfContactNo = formattedTextField_5_1_2;
+		formattedTextField_5_1_2.setBounds(134, 238, 278, 20);
+		RegisterPanel.add(formattedTextField_5_1_2);
 		
 		JPanel ActivityLogsPanel = new JPanel();
 		ActivityLogsPanel.setBackground(new Color(192, 192, 192));
 		rightContentPanel.add(ActivityLogsPanel, "name_72247065996200");
 		
 		uiReturn.windowRef = this;
+		
 		
 		bookManagmentUI.initActionListener();
 		uiRenting.initActionResponse();
