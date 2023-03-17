@@ -59,6 +59,9 @@ public class UIUserInfo implements ActionListener {
 	private static void enterActionResponse() {
 		
 		boolean success = true;
+		panel.removeAll();
+		panel.revalidate();
+		panel.repaint();
 		try {
 			String userID = ftfID.getText();
 			
@@ -77,6 +80,28 @@ public class UIUserInfo implements ActionListener {
 				
 				tfName.setText(name); tfGender.setText(gender); tfAddress.setText(addr); tfRole.setText(role); tfEmail.setText(email); tfContactNo.setText(conNum);
 				
+				String stm = "SELECT (bookID) FROM ownershipinfo WHERE userID = " + userID;
+				ResultSet t = st.executeQuery(stm);
+				ArrayList<String> bookIDs = new ArrayList<String>();
+				while(t.next()) {
+					bookIDs.add( String.valueOf(t.getInt("bookID")) );
+				}
+				
+				for (String bookID : bookIDs) {
+					
+					String query = "SELECT * FROM bookinfo WHERE bookID = " + bookID;
+					ResultSet s = st.executeQuery(query);
+					if(s.next()) {
+						
+						String parsed = "ID: " + s.getString("bookID") + "   NAME: " + s.getString("bookName") + "   CATEGORY: " + s.getString("bookCategory") + "   QTY: " + s.getString("bookQTY");
+						JLabel j = new JLabel(parsed);
+						panel.add(j);
+					}
+					
+					
+				}
+				
+				
 				
 			}else {
 				success = false;
@@ -90,7 +115,7 @@ public class UIUserInfo implements ActionListener {
 		}
 		
 		if(success) JOptionPane.showMessageDialog(windowRef, "User found!"); else JOptionPane.showMessageDialog(windowRef, "User was not found in database!");
-		
+		panel.revalidate(); panel.repaint();
 	}
 	
 	
