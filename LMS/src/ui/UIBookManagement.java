@@ -1,5 +1,7 @@
 package ui;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -24,7 +26,7 @@ import javax.swing.text.MaskFormatter;
 public class UIBookManagement implements ActionListener {
 	
 	public static JTextField tfName, tfAuthor, tfCategory;
-	public static JButton btnSearch, btnCreate, btnDelete, btnAdd, btnSubtract;
+	public static JButton btnSearch, btnCreate, btnDelete, btnAdd, btnSubtract, btnShowAll;
 	public static JFormattedTextField ftfID, ftfYear;
 	public static Connection dtbConn;
 	public static JScrollPane scrollPane;
@@ -64,7 +66,7 @@ public class UIBookManagement implements ActionListener {
 		btnDelete.addActionListener(this);
 		btnAdd.addActionListener(this);
 		btnSubtract.addActionListener(this);
-		
+		btnShowAll.addActionListener(this);
 	}
 	
 	
@@ -91,6 +93,42 @@ public class UIBookManagement implements ActionListener {
 		else if(btn == btnSubtract) {
 			qtyActionResponse(false);
 		}
+	
+		else if(btn == btnShowAll) {
+			showAllActionResponse();
+		}
+		
+	}
+	
+	
+	
+	private static void showAllActionResponse() {
+		checkBox.clear();
+		
+		try {
+			Statement st = dtbConn.createStatement();
+			
+			ResultSet r = st.executeQuery("SELECT * FROM bookinfo");
+			while(r.next()) {
+				
+				String parsed = "ID: " + r.getString("bookID") + "   NAME: " + r.getString("bookName") + "   CATEGORY: " + r.getString("bookCategory") + "   QTY: " + r.getString("bookQTY");
+				JCheckBox j = new JCheckBox(parsed);
+				j.setBackground(new Color(128,128,128));
+				checkBox.add(j);
+				panel.add(j);	
+				
+			}
+			
+			
+			
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		
+		panel.revalidate();
+		panel.repaint();
+		
 		
 	}
 	
@@ -149,6 +187,7 @@ public class UIBookManagement implements ActionListener {
 	               JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) return;
 		
 		boolean success = true;
+		
 		try {
 			Statement st = dtbConn.createStatement();
 			
@@ -160,14 +199,12 @@ public class UIBookManagement implements ActionListener {
 				if(j.isSelected()) {
 					
 					
-					
-				
-					
 					String bookID = j.getText().substring(0, j.getText().indexOf("NAME: ")).replaceAll("[^0-9]", "");
 					
 					String stm = "DELETE FROM bookinfo WHERE bookID = " + bookID;
 					st.executeUpdate(stm);
-					
+					st.executeUpdate("INSERT INTO deleted_ids VALUES(0, " + bookID + ")");
+					numOfBookEntries--;
 				}
 				
 				
@@ -185,6 +222,7 @@ public class UIBookManagement implements ActionListener {
 		checkBox.clear();
 		panel.removeAll();
 		panel.revalidate();
+		panel.repaint();
 	}
 	
 	
@@ -223,15 +261,27 @@ public class UIBookManagement implements ActionListener {
 			}
 			else {
 				
-				Statement st = dtbConn.createStatement();
-				String str = "SELECT * FROM bookinfo WHERE bookName LIKE " + bookName + " OR bookCategory LIKE " + bookCat + " OR bookAuthor LIKE " + bookAuthor + " OR bookYear = " + bookYear + ";";
-				ResultSet r = st.executeQuery(str);
 				
+				String name = tfName.getText(), author = tfAuthor.getText()  , category =  tfCategory.getText();
+				
+				
+				
+				String stmName = !name.isEmpty() ? "WHERE bookQTY > 0 AND bookName LIKE " + "'"+name+"%' OR " : " WHERE bookQTY > 0 AND ";
+				String stmAuthor = !author.isEmpty() ?  "bookAuthor LIKE " + "'"+author+"%' OR " : " bookID = -1 OR ";
+				String stmCat = !category.isEmpty() ?  "bookCategory LIKE " + "'"+category+"%'" : " bookID = -1";
+				
+				
+				String str = "SELECT * FROM bookinfo " + stmName + stmAuthor + stmCat + ";";
+				
+				Statement st = dtbConn.createStatement();
+				ResultSet r = st.executeQuery(str);
+				Font f = new Font("Tahoma Bold", Font.BOLD, 12) ;
 				while(r.next()) {
 					
 					String parsed = "ID: " + r.getString("bookID") + "   NAME: " + r.getString("bookName") + "   CATEGORY: " + r.getString("bookCategory") + "   QTY: " + r.getString("bookQTY");
 					JCheckBox j = new JCheckBox(parsed);
-					
+					j.setBackground(new Color(128,128,128));
+					j.setFont(f);
 					checkBox.add(j);
 					panel.add(j);	
 				}
@@ -253,6 +303,39 @@ public class UIBookManagement implements ActionListener {
 		panel.revalidate();
 		panel.repaint();
 	}
+	
+	
+	
+	
+	
+	
+	private static String generateID()  {
+		
+		Statement st;
+		try {
+			st = dtbConn.createStatement();
+		
+			ResultSet r = st.executeQuery("SELECT (id) FROM deleted_ids WHERE idType = 0");
+			
+			if(r.next()) {
+				String id = String.valueOf(r.getInt("id"));
+				st.executeUpdate("DELETE FROM deleted_ids WHERE id = " + id);
+				return id;
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		return String.valueOf(numOfBookEntries + 1);
+	}
+	
+	
+	
 	
 	private static void createActionResponse() {
 		
@@ -280,9 +363,9 @@ public class UIBookManagement implements ActionListener {
 		
 		
 		
-		String bookName = "'" + tfName.getText() + "'", bookAuthor = "'" + tfAuthor.getText() + "'", bookCat = "'" + tfCategory.getText() + "'", bookID = String.valueOf(numOfBookEntries + 1), bookYear = ftfYear.getText();
+		String bookName = "'" + tfName.getText() + "'", bookAuthor = "'" + tfAuthor.getText() + "'", bookCat = "'" + tfCategory.getText() + "'", bookID = generateID(), bookYear = ftfYear.getText();
 		boolean createSuccess = true;
-		boolean isValid = !(bookName.isBlank() && bookAuthor.isBlank() && bookCat.isBlank() && bookYear.isBlank());
+		boolean isValid = !(bookName.isEmpty() && bookAuthor.isEmpty() && bookCat.isEmpty() && bookYear.isEmpty());
 		String str = null;
 		if(isValid) {
 			
