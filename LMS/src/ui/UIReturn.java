@@ -98,6 +98,8 @@ public class UIReturn implements ActionListener{
 				
 				
 			}
+			if(bookIDs.isEmpty())
+				JOptionPane.showMessageDialog(windowRef, "No book rented!");
 			
 			panel.revalidate();
 			panel.repaint();

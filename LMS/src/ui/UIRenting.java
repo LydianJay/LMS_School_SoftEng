@@ -228,7 +228,7 @@ public class UIRenting implements ActionListener {
 		panel1.repaint();
 		searchQuery.clear();
 		
-		if(tfBookName.getText().isBlank() && tfAuthor.getText().isBlank() && tfCategory.getText().isBlank()) return;
+		if(tfBookName.getText().isEmpty() && tfAuthor.getText().isEmpty() && tfCategory.getText().isEmpty()) return;
 		
 		
 		try {
@@ -237,9 +237,9 @@ public class UIRenting implements ActionListener {
 			
 			
 			
-			String stmName = !name.isBlank() ? "WHERE bookQTY > 0 AND bookName LIKE " + "'"+name+"%' OR " : " WHERE bookQTY > 0 AND ";
-			String stmAuthor = !author.isBlank() ?  "bookAuthor LIKE " + "'"+author+"%' OR " : " bookID = -1 OR ";
-			String stmCat = !category.isBlank() ?  "bookCategory LIKE " + "'"+category+"%'" : " bookID = -1";
+			String stmName = !name.isEmpty() ? "WHERE bookQTY > 0 AND bookName LIKE " + "'"+name+"%' OR " : " WHERE bookQTY > 0 AND ";
+			String stmAuthor = !author.isEmpty() ?  "bookAuthor LIKE " + "'"+author+"%' OR " : " bookID = -1 OR ";
+			String stmCat = !category.isEmpty() ?  "bookCategory LIKE " + "'"+category+"%'" : " bookID = -1";
 			
 			Statement st = dtbConn.createStatement();
 			
