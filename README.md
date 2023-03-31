@@ -22,6 +22,6 @@
 # Installation
 Download the latest version of the jar file
 https://github.com/LydianJay/LMS_School_SoftEng/releases
-extract idbata1.zip to the sql database folder
+Import the sql database
 
 
