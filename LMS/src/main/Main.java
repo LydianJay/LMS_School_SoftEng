@@ -67,7 +67,6 @@ import java.util.Random;
 import javax.swing.JFormattedTextField;
 import javax.swing.JList;
 import javax.swing.JScrollBar;
-import user.Client;
 import ui.UIBookManagement;
 import ui.UIRenting;
 import ui.UIReturn;
@@ -110,7 +109,6 @@ public class Main extends JFrame implements ActionListener {
 	private JPanel scrPanelUsermng;
 	private JButton btnUsermngShowAll;
 	private JButton btnUsermngUnregis;
-	private JButton btnUsermngModify;
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JButton btnBookManagement;
@@ -472,7 +470,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		JLabel lblLogin = new JLabel("LOGIN");
 		lblLogin.setForeground(new Color(27, 27, 27));
-		lblLogin.setBounds(127, 0, 83, 55);
+		lblLogin.setBounds(127, 0, 113, 55);
 		lblLogin.setFont(new Font("Times New Roman", Font.BOLD, 25));
 		panel.add(lblLogin);
 		
@@ -503,7 +501,7 @@ public class Main extends JFrame implements ActionListener {
 		panel.add(lblPassword);
 		
 		btnLogin = new JButton("Login");
-		btnLogin.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+		btnLogin.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnLogin.setForeground(new Color(0, 0, 0));
 		btnLogin.setBackground(new Color(223, 156, 32));
 		btnLogin.setBounds(121, 124, 89, 23);
@@ -547,34 +545,34 @@ public class Main extends JFrame implements ActionListener {
 		leftContentPanel.setLayout(null);
 		
 		btnRegisterSelection = new JButton("");
-		btnRegisterSelection.setBounds(10, 308, 176, 47);
+		btnRegisterSelection.setBounds(10, 365, 176, 47);
 		btnRegisterSelection.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Register.png")).getImage().getScaledInstance(btnRegisterSelection.getWidth(), btnRegisterSelection.getHeight(), Image.SCALE_SMOOTH)));
 		btnRegisterSelection.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnRegisterSelection.addActionListener(this);
 		leftContentPanel.add(btnRegisterSelection);
 		
-		btnBookManagement = new JButton(""); btnBookManagement.setBounds(10, 244, 176, 47);
+		btnBookManagement = new JButton(""); btnBookManagement.setBounds(10, 292, 176, 47);
 		btnBookManagement.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Book management.png")).getImage().getScaledInstance(btnBookManagement.getWidth(), btnBookManagement.getHeight(), Image.SCALE_SMOOTH)));
 		btnBookManagement.addActionListener(this);
 		btnBookManagement.setFont(new Font("Tahoma", Font.BOLD, 12));
 		leftContentPanel.add(btnBookManagement);
 		
 		btnUserManagement = new JButton("");
-		btnUserManagement.setBounds(10, 186, 176, 47);
+		btnUserManagement.setBounds(10, 222, 176, 47);
 		btnUserManagement.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/User management.png")).getImage().getScaledInstance(btnUserManagement.getWidth(), btnUserManagement.getHeight(), Image.SCALE_SMOOTH)));
 		btnUserManagement.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnUserManagement.addActionListener(this);
 		leftContentPanel.add(btnUserManagement);
 		
 		btnUserInformation = new JButton(""); 
-		btnUserInformation.setBounds(10, 128, 176, 47);
+		btnUserInformation.setBounds(10, 152, 176, 47);
 		btnUserInformation.addActionListener(this);
 		btnUserInformation.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/User Information.png")).getImage().getScaledInstance(btnUserInformation.getWidth(), btnUserInformation.getHeight(), Image.SCALE_SMOOTH)));
 		btnUserInformation.setFont(new Font("Tahoma", Font.BOLD, 12));
 		leftContentPanel.add(btnUserInformation);
 		
 		btnReturn = new JButton(""); 
-		btnReturn.setBounds(10, 70, 176, 47);
+		btnReturn.setBounds(10, 83, 176, 47);
 		btnReturn.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Return.png")).getImage().getScaledInstance(btnReturn.getWidth(), btnReturn.getHeight(), Image.SCALE_SMOOTH)));
 		btnReturn.addActionListener(this);
 		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -588,12 +586,6 @@ public class Main extends JFrame implements ActionListener {
 		btnSeachrent.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		leftContentPanel.add(btnSeachrent);
-		
-		JButton btnActivityLogs = new JButton("");
-		btnActivityLogs.setBounds(10, 366, 176, 47);
-		btnActivityLogs.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Activity logs.png")).getImage().getScaledInstance(btnActivityLogs.getWidth(), btnActivityLogs.getHeight(), Image.SCALE_SMOOTH)));
-		btnActivityLogs.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(btnActivityLogs);
 		
 		rightContentPanel = new JPanel();
 		rightContentPanel.setBounds(199, 0, 460, 424);
@@ -669,7 +661,7 @@ public class Main extends JFrame implements ActionListener {
 		textField_4.setColumns(10);
 		
 		JButton btnNewButton_4 = new JButton("SEARCH"); 
-		btnNewButton_4.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_4.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_4.setForeground(Color.BLACK);
 		btnNewButton_4.setBackground(new Color(255, 163, 26));uiRenting.btnSearch = btnNewButton_4;
 		btnNewButton_4.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -698,7 +690,7 @@ public class Main extends JFrame implements ActionListener {
 		SearchRentPanel.add(lblNewLabel_22);
 		
 		JButton btnNewButton_5 = new JButton("ADD"); 
-		btnNewButton_5.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));uiRenting.btnAdd = btnNewButton_5;
+		btnNewButton_5.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));uiRenting.btnAdd = btnNewButton_5;
 		btnNewButton_5.setBackground(new Color(255, 163, 26));
 		btnNewButton_5.setForeground(new Color(27, 27, 27));
 		btnNewButton_5.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -706,7 +698,7 @@ public class Main extends JFrame implements ActionListener {
 		SearchRentPanel.add(btnNewButton_5);
 		
 		JButton btnNewButton_6 = new JButton("REMOVE"); 
-		btnNewButton_6.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_6.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_6.setBackground(new Color(255, 163, 26));
 		btnNewButton_6.setForeground(new Color(27, 27, 27));uiRenting.btnRemove = btnNewButton_6;
 		btnNewButton_6.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -714,7 +706,7 @@ public class Main extends JFrame implements ActionListener {
 		SearchRentPanel.add(btnNewButton_6);
 		
 		JButton btnNewButton_7 = new JButton("CONFIRM"); 
-		btnNewButton_7.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_7.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_7.setForeground(new Color(27, 27, 27));
 		btnNewButton_7.setBackground(new Color(255, 163, 26));uiRenting.btnConfirm = btnNewButton_7;
 		btnNewButton_7.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -772,14 +764,14 @@ public class Main extends JFrame implements ActionListener {
 		panel_4.setLayout(new BoxLayout(panel_4, BoxLayout.Y_AXIS));
 		
 		JButton btnNewButton_8 = new JButton("ENTER"); 
-		btnNewButton_8.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_8.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_8.setBackground(new Color(255, 163, 26));uiReturn.btnEnter = btnNewButton_8;
 		btnNewButton_8.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_8.setBounds(206, 19, 89, 23);
 		ReturnPanel.add(btnNewButton_8);
 		
 		JButton btnNewButton_9 = new JButton("RETURN"); 
-		btnNewButton_9.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_9.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_9.setBackground(new Color(255, 163, 26));uiReturn.btnReturn = btnNewButton_9;
 		btnNewButton_9.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_9.setBounds(361, 110, 89, 23);
@@ -807,7 +799,7 @@ public class Main extends JFrame implements ActionListener {
 		UserInformationPanel.add(formattedTextField_4);
 		
 		JButton btnNewButton_10 = new JButton("ENTER"); 
-		btnNewButton_10.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_10.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_10.setBackground(new Color(255, 163, 26));uiUserInfo.btnEnter = btnNewButton_10; uiUserInfo.initActionResponse();
 		btnNewButton_10.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_10.setBounds(347, 8, 89, 23);
@@ -961,7 +953,7 @@ public class Main extends JFrame implements ActionListener {
 		tFieldUsermngUserName.setColumns(10);
 		
 		btnUsermngSearch = new JButton("Search");
-		btnUsermngSearch.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnUsermngSearch.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngSearch.setBackground(new Color(255, 163, 26));
 		btnUsermngSearch.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnUsermngSearch.setBounds(221, 3, 114, 29);
@@ -979,33 +971,26 @@ public class Main extends JFrame implements ActionListener {
 		JScrollPane scrollPane = new JScrollPane(scrPanelUsermng);
 		scrollPane.setViewportBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBounds(10, 83, 440, 330);
+		scrollPane.setBounds(10, 106, 440, 307);
 		UserManagementPanel.add(scrollPane);
 		scrollPane.setViewportView(scrPanelUsermng);
 		scrPanelUsermng.setLayout(new BoxLayout(scrPanelUsermng, BoxLayout.Y_AXIS));
 		
 		btnUsermngUnregis = new JButton("UNREGISTER");
-		btnUsermngUnregis.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnUsermngUnregis.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngUnregis.setBackground(new Color(255, 163, 26));
 		btnUsermngUnregis.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngUnregis.setBounds(345, 3, 115, 29);
+		btnUsermngUnregis.setBounds(10, 72, 115, 29);
 		btnUsermngUnregis.addActionListener(this);
 		UserManagementPanel.add(btnUsermngUnregis);
 		
 		btnUsermngShowAll = new JButton("Show All");
-		btnUsermngShowAll.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnUsermngShowAll.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngShowAll.setBackground(new Color(255, 163, 26));
 		btnUsermngShowAll.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngShowAll.setBounds(221, 43, 114, 29);
+		btnUsermngShowAll.setBounds(346, 3, 114, 29);
 		btnUsermngShowAll.addActionListener(this);
 		UserManagementPanel.add(btnUsermngShowAll);
-		
-		btnUsermngModify = new JButton("MODIFY");
-		btnUsermngModify.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
-		btnUsermngModify.setBackground(new Color(255, 163, 26));
-		btnUsermngModify.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngModify.setBounds(345, 43, 115, 29);
-		UserManagementPanel.add(btnUsermngModify);
 		//scrPanelUsermng.setBounds(scrollPane.getBounds());
 		
 		
@@ -1021,7 +1006,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		JScrollPane scrollPaneBookMng = new JScrollPane(panel_1); bookManagmentUI.scrollPane = scrollPaneBookMng;
-		scrollPaneBookMng.setBounds(10, 160, 440, 253);
+		scrollPaneBookMng.setBounds(10, 149, 440, 263);
 		BookManagementPanel.add(scrollPaneBookMng);
 		
 		
@@ -1113,24 +1098,24 @@ public class Main extends JFrame implements ActionListener {
 		BookManagementPanel.add(formattedTextField_1);
 		
 		JButton btnNewButton = new JButton("CREATE"); 
-		btnNewButton.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton.setBackground(new Color(255, 163, 26));bookManagmentUI.btnCreate = btnNewButton;
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton.setBounds(361, 8, 89, 23);
+		btnNewButton.setBounds(235, 4, 89, 23);
 		BookManagementPanel.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("DELETE"); 
-		btnNewButton_1.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_1.setBackground(new Color(255, 163, 26));bookManagmentUI.btnDelete = btnNewButton_1;
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_1.setBounds(266, 44, 108, 23);
+		btnNewButton_1.setBounds(346, 4, 89, 23);
 		BookManagementPanel.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("SEARCH"); 
-		btnNewButton_2.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_2.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_2.setBackground(new Color(255, 163, 26));bookManagmentUI.btnSearch = btnNewButton_2;
 		btnNewButton_2.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_2.setBounds(266, 8, 89, 23);
+		btnNewButton_2.setBounds(237, 39, 89, 23);
 		BookManagementPanel.add(btnNewButton_2);
 		
 		JLabel lblNewLabel_19 = new JLabel("QTY:"); 
@@ -1144,24 +1129,24 @@ public class Main extends JFrame implements ActionListener {
 		BookManagementPanel.add(lblNewLabel_19);
 		
 		JButton btnNewButton_3 = new JButton("ADD"); 
-		btnNewButton_3.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_3.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_3.setBackground(new Color(255, 163, 26));bookManagmentUI.btnAdd = btnNewButton_3;
 		btnNewButton_3.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_3.setBounds(292, 117, 82, 20);
 		BookManagementPanel.add(btnNewButton_3);
 		
 		JButton btnNewButton_3_1 = new JButton("SUB"); 
-		btnNewButton_3_1.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_3_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_3_1.setBackground(new Color(255, 163, 26));bookManagmentUI.btnSubtract = btnNewButton_3_1;
 		btnNewButton_3_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_3_1.setBounds(378, 117, 82, 20);
 		BookManagementPanel.add(btnNewButton_3_1);
 		
-		JButton btnNewButton_11 = new JButton("SHOW ALL"); 
-		btnNewButton_11.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));bookManagmentUI.btnShowAll = btnNewButton_11;
+		JButton btnNewButton_11 = new JButton("ALL"); 
+		btnNewButton_11.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));bookManagmentUI.btnShowAll = btnNewButton_11;
 		btnNewButton_11.setBackground(new Color(255, 163, 26));
 		btnNewButton_11.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_11.setBounds(266, 82, 108, 23);
+		btnNewButton_11.setBounds(237, 70, 87, 23);
 		BookManagementPanel.add(btnNewButton_11);
 		
 		RegisterPanel = new JPanel();
@@ -1304,7 +1289,7 @@ public class Main extends JFrame implements ActionListener {
 		RegisterPanel.add(lblNewLabel_14);
 		
 		btnRegistration = new JButton("Register"); 
-		btnRegistration.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnRegistration.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnRegistration.setBackground(new Color(255, 163, 26));uiUserRegis.btnRegister = btnRegistration; btnRegistration.addActionListener(uiUserRegis);
 		btnRegistration.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnRegistration.setBounds(194, 385, 103, 28);
@@ -1350,10 +1335,6 @@ public class Main extends JFrame implements ActionListener {
 		formattedTextField_5_1_2.setBackground(new Color(128, 128, 128));uiUserRegis.ftfContactNo = formattedTextField_5_1_2;
 		formattedTextField_5_1_2.setBounds(134, 240, 278, 20);
 		RegisterPanel.add(formattedTextField_5_1_2);
-		
-		JPanel ActivityLogsPanel = new JPanel();
-		ActivityLogsPanel.setBackground(new Color(192, 192, 192));
-		rightContentPanel.add(ActivityLogsPanel, "name_72247065996200");
 		
 		uiReturn.windowRef = this;
 		
