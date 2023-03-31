@@ -1,14 +1,18 @@
 package main;
 
+
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -67,14 +71,20 @@ import java.util.Random;
 import javax.swing.JFormattedTextField;
 import javax.swing.JList;
 import javax.swing.JScrollBar;
-import user.Client;
 import ui.UIBookManagement;
 import ui.UIRenting;
 import ui.UIReturn;
 import ui.UIUserInfo;
 import ui.UIUserRegistration;
+import ui.UILogin;
+import ui.UIUserManagement;
+
 import java.awt.Toolkit;
 import javax.swing.border.MatteBorder;
+import java.util.HashMap;
+
+
+
 
 public class Main extends JFrame implements ActionListener {
 	
@@ -83,50 +93,43 @@ public class Main extends JFrame implements ActionListener {
 	private static UIReturn uiReturn = new UIReturn();
 	private static UIUserInfo uiUserInfo = new UIUserInfo();
 	private static UIUserRegistration uiUserRegis = new UIUserRegistration();
+	private static UILogin uiLogin = new UILogin();
+	private static UIUserManagement uiUserManagement = new UIUserManagement();
 	
-	private static final int PNL_SEARCH = 0, PNL_RETURN = 1, PNL_USER_INFO = 2, PNL_USER_MNG = 3, PNL_BOOK_MNG = 4, PNL_REGIS = 5, PNL_LOG = 6;
+	
+	private static final int PNL_SEARCH = 0, PNL_RETURN = 1, PNL_USER_INFO = 2, PNL_USER_MNG = 3, PNL_BOOK_MNG = 4, PNL_REGIS = 5;
 	
 	private static String dtbUrl = "jdbc:mysql://localhost:3306/lms_database", dtbUsername = "root", dtbPassword = "";
 	private static Connection dtbConn;
-	private static ArrayList<JCheckBox> chkBoxUsermng = new ArrayList<JCheckBox>();
-	
-	
-	private JButton btnLogin;
-	private JPasswordField pfieldPassword;
+	private static HashMap<Component, String> imageResourceStr = new HashMap<Component, String>();
 	private JPanel mainPanel;
 	private JButton btnRegisterSelection;
-	private JPanel rightContentPanel;
-	private JPanel HomeScreen;
+	private JPanel pnlRightContentPanel;
+	private JPanel pnlHomeScreen;
 	private JRadioButton rdbtnFemale;
 	private JRadioButton rdbtnMale;
 	private JButton btnRegistration;
 	private JPanel RegisterPanel;
-	private JFormattedTextField ftFieldUserID;
 	private MaskFormatter maskFUserID;
-	private JTextField tFieldUsermngUserName;
-	private JFormattedTextField fTFieldUsermngUserID;
-	private JButton btnUsermngSearch;
 	private JButton btnUserManagement;
-	private JPanel scrPanelUsermng;
-	private JButton btnUsermngShowAll;
-	private JButton btnUsermngUnregis;
-	private JButton btnUsermngModify;
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JButton btnBookManagement;
 	private JButton btnSeachrent;
 	private JButton btnReturn;
 	private JButton btnUserInformation;
-	
-	
+	private JPanel pnlLeftContentPanel;
+	private Dimension currentSize;
+	private static Dimension defaultSize;
+	private static Dimension maximizedSize;
 	
 	
 	private void movePanel(int idx) {
 		
 		
-		CardLayout c = (CardLayout)(this.rightContentPanel.getLayout());
-		c.first(rightContentPanel);
-		for(int i = 0; i < idx; i++) c.next(rightContentPanel);
+		CardLayout c = (CardLayout)(this.pnlRightContentPanel.getLayout());
+		c.first(pnlRightContentPanel);
+		for(int i = 0; i < idx; i++) c.next(pnlRightContentPanel);
 		
 	}
 	
@@ -138,54 +141,9 @@ public class Main extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		JButton b = (JButton)(e.getSource());
-		if(b == btnLogin) {
-			
-			
-			int userId = Integer.valueOf(ftFieldUserID.getText());
-			String userPass = new String(pfieldPassword.getPassword());
 		
-			try {
-				Statement st = dtbConn.createStatement();
-				String str = "SELECT * FROM `userinfo` WHERE userID = " + String.valueOf(userId);
-				ResultSet r = st.executeQuery(str);
-				if(r.next()) {
-					String userName = r.getString("userName");
-					String userCorrectPass = r.getString("userPass");
-					int role = r.getInt("userRole");
-					
-					if(role == 0) {
-						JOptionPane.showMessageDialog(this, "User is not an administrator");
-						pfieldPassword.setText("");
-						return;
-					}
-					
-					if(userPass.compareTo(userCorrectPass) == 0) {
-						CardLayout c = (CardLayout)(mainPanel.getLayout());
-						c.next(this.getContentPane());
-					}
-					else {
-						JOptionPane.showMessageDialog(this, "UserID or password Incorrect!");
-						pfieldPassword.setText("");
-					}
-					
-					
-					
-				}
-				else {
-					
-					JOptionPane.showMessageDialog(this, "UserID or password Incorrect!");
-					pfieldPassword.setText("");
-				}
-				
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-			
-		}
-		
-		
-		else if(b == this.btnRegisterSelection) {
-			CardLayout c = (CardLayout)(this.rightContentPanel.getLayout());
+		if(b == this.btnRegisterSelection) {
+			CardLayout c = (CardLayout)(this.pnlRightContentPanel.getLayout());
 			movePanel(PNL_REGIS);
 		}
 		
@@ -208,171 +166,56 @@ public class Main extends JFrame implements ActionListener {
 			movePanel(PNL_USER_INFO);
 		}
 		
-		else if(b == this.btnUsermngSearch) {
-			sectionUserManagementSearch();
-		}
-		else if(b == this.btnUsermngShowAll) {
-			sectionUserManagementShowAll();
-		}
-		
-		else if(b == this.btnUsermngUnregis) {
-			sectionUserManagementUnregis();
-		}
-		
+	
 	}
 	
-	private void sectionUserManagementUnregis() {
+	
+	
+	public static void resizeAComponent(Component c, Dimension old, Dimension n) {
+		
+		double rX = n.getWidth() / old.getWidth();
+		double rY = n.getWidth() / old.getWidth();
 		
 		
-		if(JOptionPane.showConfirmDialog(this,"Are you sure?", "DELETE USER",
-	               JOptionPane.YES_NO_OPTION,
-	               JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) return;
+		
+		Dimension newSize = new Dimension( (int)(c.getWidth() * rX), (int)(c.getHeight() * rY));
+		
+		c.setSize(newSize);
+		int x = (int) (c.getX() * rX), y = (int) (c.getY() * rY);
+		c.setLocation(x, y);
+		
+		c.revalidate();
+		c.repaint();
 		
 		
-		boolean success = true;
-		for(JCheckBox j : chkBoxUsermng) {
+		
+		if(c.getClass().getName().compareTo("javax.swing.JPanel") == 0) {
+			JPanel frame = (JPanel) c;
 			
-			if(j.isSelected()) {
+			for (Component d : frame.getComponents()) {
 				
-				try {
-					Statement st = dtbConn.createStatement();
+				
+				
+				newSize = new Dimension( (int)(d.getWidth() * rX), (int)(d.getHeight() * rY));
+				
+				d.setSize(newSize);
+				x = (int) (d.getX() * rX); 
+				y = (int) (d.getY() * rY);
+				d.setLocation(x, y);
+				//System.out.println(d.getClass().toString());
+				if(Main.imageResourceStr.containsKey(d)) {
+					JButton j = (JButton) d;
+					String res = Main.imageResourceStr.get(d);
 					
-					String userName;
-					int idx = j.getText().indexOf("Name:") + 7;
-					userName = "'" + j.getText().substring(idx) + "'";
-					
-					ResultSet query = st.executeQuery("SELECT (userID) FROM userinfo WHERE userName = " + userName);
-					if(query.next()) {
-						
-						String userID = String.valueOf( query.getLong("userID"));
-						
-						st.executeUpdate("INSERT INTO deleted_ids VALUES(1, " + userID + ")");
-						
-						String stm = "DELETE FROM `userinfo` WHERE userName = " + userName;
-						st.executeUpdate(stm);
-						
-					}
-					
-					
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					success = false;
-					e.printStackTrace();
+					j.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource(res)).getImage().getScaledInstance(j.getWidth(), j.getHeight(), Image.SCALE_SMOOTH)));
 				}
 				
-				
+				d.revalidate();
+				d.repaint();
 			}
-			
 			
 		}
-		if(success) JOptionPane.showMessageDialog(this, "Deleted Successfuly!"); else JOptionPane.showMessageDialog(this, "Delete Failed!");
-		scrPanelUsermng.removeAll();
-		scrPanelUsermng.revalidate();
-		scrPanelUsermng.repaint();
-		chkBoxUsermng.clear();
 	}
-	
-	
-	
-	private void sectionUserManagementSearch() {
-		
-		String userName = "'" + this.tFieldUsermngUserName.getText() + "%'";
-		String userID = this.fTFieldUsermngUserID.getText();
-		
-		
-		this.scrPanelUsermng.removeAll();
-		this.scrPanelUsermng.revalidate();
-		
-		Statement st;
-		try {
-			st = dtbConn.createStatement();
-			
-			if(userID.isEmpty() == false && userID.compareTo("0000000000") != 0) {
-				chkBoxUsermng.clear();
-
-				String stm = "SELECT * FROM `userinfo` WHERE userID = " + userID;
-				ResultSet r = st.executeQuery(stm);
-				
-				while(r.next()) {
-					
-					String parsed = "UserID:  " + r.getString("userID") + " Name:  " + r.getString("userName");
-					JCheckBox j = new JCheckBox(parsed);
-					
-					chkBoxUsermng.add(j);
-					this.scrPanelUsermng.add(j);
-				}
-				
-				
-			}
-			else if(!tFieldUsermngUserName.getText().isEmpty()) {
-				
-				chkBoxUsermng.clear();
-				String stm = "SELECT * FROM `userinfo` WHERE userName LIKE " + userName;
-				ResultSet r = st.executeQuery(stm);
-				
-				while(r.next()) {
-					
-					String parsed = "UserID:  " + r.getString("userID") + " Name:  " + r.getString("userName");
-					JCheckBox j = new JCheckBox(parsed);
-					chkBoxUsermng.add(j);
-					this.scrPanelUsermng.add(j);
-				}
-				
-				
-				
-			}
-			
-			
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		scrPanelUsermng.revalidate();
-		scrPanelUsermng.repaint();
-		
-		
-		
-	}
-	
-	
-	
-	
-	
-	
-	private void sectionUserManagementShowAll() {
-		Statement st;
-		try {
-			chkBoxUsermng.clear();
-			this.scrPanelUsermng.removeAll();
-			this.scrPanelUsermng.revalidate();
-			
-			st = dtbConn.createStatement();
-			String stm = "SELECT * FROM `userinfo`";
-			ResultSet r = st.executeQuery(stm);
-			
-			while(r.next()) {
-				
-				String parsed = "UserID:  " + r.getString("userID") + " Name:  " + r.getString("userName");
-				JCheckBox j = new JCheckBox(parsed);
-				chkBoxUsermng.add(j);
-				this.scrPanelUsermng.add(j);
-			}
-			
-			this.scrPanelUsermng.revalidate();
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-	}
-	
-	
-	
-	
 	
 	
 	
@@ -411,6 +254,35 @@ public class Main extends JFrame implements ActionListener {
 					Main frame = new Main();
 					frame.setVisible(true);
 					
+					frame.addComponentListener(
+							new ComponentAdapter() {
+								
+								public void componentResized(ComponentEvent e) {
+									
+									Dimension oldSize = frame.currentSize;
+									
+									frame.currentSize = e.getComponent().getSize();
+									Dimension newSize = e.getComponent().getSize();
+									
+									resizeAComponent(frame.pnlLeftContentPanel, oldSize, newSize);
+									resizeAComponent(frame.pnlRightContentPanel, oldSize, newSize);
+									
+									frame.uiLogin.resizeCall(oldSize, newSize);
+									frame.uiUserManagement.resizeCall(oldSize, newSize);
+									frame.uiRenting.resizeCall(oldSize, newSize);
+									frame.bookManagmentUI.resizeCall(oldSize, newSize);
+									frame.uiReturn.resizeCall(oldSize, newSize);
+									frame.uiUserInfo.resizeCall(oldSize, newSize);
+									frame.uiUserRegis.resizeCall(oldSize, newSize);
+									
+								}
+								
+							}
+							
+							);
+					
+					
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -427,17 +299,24 @@ public class Main extends JFrame implements ActionListener {
 	 */
 	@SuppressWarnings("static-access")
 	public Main() {
+		
+		
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/lms_icon.png")));
 		bookManagmentUI.windowRef = this;
 		uiUserInfo.windowRef = this;
 		uiUserRegis.windowRef = this;
-		
-		setResizable(false);
+		uiUserManagement.windowRef = this;
 		setEnabled(true);
 		setTitle("Library Management System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		
 		setBounds(100, 100, 685, 473);
+		currentSize = this.getSize();
+		defaultSize = new Dimension(this.getSize());
+		setResizable(true);
+		
+		
 		
 		
 		try {
@@ -448,14 +327,14 @@ public class Main extends JFrame implements ActionListener {
 			e.printStackTrace();
 		}
 		
-		mainPanel = new JPanel();
+		mainPanel = new JPanel(); uiLogin.mainPanel = mainPanel;
 		mainPanel.setBackground(new Color(0, 0, 0));
 		mainPanel.setForeground(SystemColor.text);
 		mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(mainPanel);
 		mainPanel.setLayout(new CardLayout(0, 0));
-		JPanel Login = new JPanel();
+		JPanel Login = new JPanel(); uiLogin.compList.add(Login);
 		Login.setBorder(new LineBorder(new Color(255, 163, 79), 0, true));
 		Login.setBackground(new Color(0, 0, 0));
 		Login.setForeground(new Color(128, 255, 0));
@@ -463,26 +342,26 @@ public class Main extends JFrame implements ActionListener {
 		
 		Login.setLayout(null);
 		
-		JPanel panel = new JPanel();
+		JPanel panel = new JPanel(); uiLogin.compList.add(panel);
 		panel.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		panel.setBackground(new Color(128, 128, 128));
 		panel.setBounds(146, 209, 351, 158);
 		Login.add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblLogin = new JLabel("LOGIN");
+		JLabel lblLogin = new JLabel("LOGIN"); uiLogin.compList.add(lblLogin);
 		lblLogin.setForeground(new Color(27, 27, 27));
-		lblLogin.setBounds(127, 0, 83, 55);
+		lblLogin.setBounds(127, 0, 113, 55);
 		lblLogin.setFont(new Font("Times New Roman", Font.BOLD, 25));
 		panel.add(lblLogin);
 		
-		pfieldPassword = new JPasswordField();
+		JPasswordField pfieldPassword = new JPasswordField(); uiLogin.passField = pfieldPassword;
 		pfieldPassword.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		pfieldPassword.setBackground(new Color(192, 192, 192));
 		pfieldPassword.setBounds(127, 83, 146, 20);
 		panel.add(pfieldPassword);
 		
-		JLabel lblUserID = new JLabel("UserID");
+		JLabel lblUserID = new JLabel("UserID"); uiLogin.compList.add(lblUserID);
 		lblUserID.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		lblUserID.setBackground(new Color(255, 163, 26));
 		lblUserID.setForeground(new Color(27, 27, 27));
@@ -492,7 +371,7 @@ public class Main extends JFrame implements ActionListener {
 		lblUserID.setBounds(45, 55, 83, 20);
 		panel.add(lblUserID);
 		
-		JLabel lblPassword = new JLabel("Password");
+		JLabel lblPassword = new JLabel("Password"); uiLogin.compList.add(lblPassword);
 		lblPassword.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		lblPassword.setBackground(new Color(255, 163, 26));
 		lblPassword.setForeground(new Color(27, 27, 27));
@@ -502,8 +381,8 @@ public class Main extends JFrame implements ActionListener {
 		lblPassword.setBounds(45, 83, 83, 20);
 		panel.add(lblPassword);
 		
-		btnLogin = new JButton("Login");
-		btnLogin.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+		JButton btnLogin = new JButton("Login"); uiLogin.btnLogin = btnLogin;
+		btnLogin.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnLogin.setForeground(new Color(0, 0, 0));
 		btnLogin.setBackground(new Color(223, 156, 32));
 		btnLogin.setBounds(121, 124, 89, 23);
@@ -513,7 +392,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		
-		ftFieldUserID = new JFormattedTextField(maskFUserID);
+		JFormattedTextField ftFieldUserID = new JFormattedTextField(maskFUserID); uiLogin.ftfUserID = ftFieldUserID;
 		ftFieldUserID.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		ftFieldUserID.setBackground(new Color(192, 192, 192));
 		ftFieldUserID.setBounds(127, 55, 146, 20);
@@ -523,86 +402,81 @@ public class Main extends JFrame implements ActionListener {
 		
 		panel.add(ftFieldUserID);
 		
-		JPanel panel_6 = new JPanel();
+		JPanel panel_6 = new JPanel(); uiLogin.compList.add(panel_6);
 		panel_6.setBorder(new BevelBorder(BevelBorder.RAISED, Color.YELLOW, null, null, null));
 		panel_6.setBackground(Color.GRAY);
 		panel_6.setBounds(77, 31, 497, 167);
 		Login.add(panel_6);
 		panel_6.setLayout(null);
 		
-		JLabel lblNewLabel_34 = new JLabel("");
-		lblNewLabel_34.setBounds(10, 11, 477, 145);
-		lblNewLabel_34.setIcon( new ImageIcon (new ImageIcon(Main.class.getResource("/res/LMS_banner.png")).getImage().getScaledInstance(lblNewLabel_34.getWidth(), lblNewLabel_34.getHeight(), Image.SCALE_SMOOTH) ) );
-		panel_6.add(lblNewLabel_34);
+		JLabel banner = new JLabel(""); uiLogin.compList.add(banner); uiLogin.banner = banner;
+		banner.setBounds(10, 11, 477, 145);
+		banner.setIcon( new ImageIcon (new ImageIcon(Main.class.getResource("/res/LMS_banner.png")).getImage().getScaledInstance(banner.getWidth(), banner.getHeight(), Image.SCALE_SMOOTH) ) );
+		panel_6.add(banner);
 		
-		HomeScreen = new JPanel();
-		HomeScreen.setBackground(new Color(128, 128, 128));
-		mainPanel.add(HomeScreen, "name_66130146280600");
-		HomeScreen.setLayout(null);
+		pnlHomeScreen = new JPanel();
+		pnlHomeScreen.setBackground(new Color(119, 118, 123)); 
+		mainPanel.add(pnlHomeScreen, "name_66130146280600");
+		pnlHomeScreen.setLayout(null); 
 		
-		JPanel leftContentPanel = new JPanel();
-		leftContentPanel.setBackground(new Color(128, 128, 128));
-		leftContentPanel.setBounds(0, 0, 195, 424);
-		HomeScreen.add(leftContentPanel);
-		leftContentPanel.setLayout(null);
+		pnlLeftContentPanel = new JPanel();
+		pnlLeftContentPanel.setBackground(new Color(128, 128, 128));
+		pnlLeftContentPanel.setBounds(0, 0, 195, 424);
+		pnlHomeScreen.add(pnlLeftContentPanel);
+		pnlLeftContentPanel.setLayout(null);
 		
-		btnRegisterSelection = new JButton("");
-		btnRegisterSelection.setBounds(10, 308, 176, 47);
+		btnRegisterSelection = new JButton(""); imageResourceStr.put(btnRegisterSelection,"/res/Register.png");
+		btnRegisterSelection.setBounds(10, 365, 176, 47);
 		btnRegisterSelection.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Register.png")).getImage().getScaledInstance(btnRegisterSelection.getWidth(), btnRegisterSelection.getHeight(), Image.SCALE_SMOOTH)));
 		btnRegisterSelection.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnRegisterSelection.addActionListener(this);
-		leftContentPanel.add(btnRegisterSelection);
+		pnlLeftContentPanel.add(btnRegisterSelection);
 		
-		btnBookManagement = new JButton(""); btnBookManagement.setBounds(10, 244, 176, 47);
+		btnBookManagement = new JButton(""); imageResourceStr.put(btnBookManagement,"/res/Book management.png");
+		btnBookManagement.setBounds(10, 292, 176, 47); 
 		btnBookManagement.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Book management.png")).getImage().getScaledInstance(btnBookManagement.getWidth(), btnBookManagement.getHeight(), Image.SCALE_SMOOTH)));
 		btnBookManagement.addActionListener(this);
 		btnBookManagement.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(btnBookManagement);
-		
-		btnUserManagement = new JButton("");
-		btnUserManagement.setBounds(10, 186, 176, 47);
+		pnlLeftContentPanel.add(btnBookManagement);
+		 
+		btnUserManagement = new JButton(""); imageResourceStr.put(btnUserManagement, "/res/User management.png");
+		btnUserManagement.setBounds(10, 222, 176, 47);
 		btnUserManagement.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/User management.png")).getImage().getScaledInstance(btnUserManagement.getWidth(), btnUserManagement.getHeight(), Image.SCALE_SMOOTH)));
 		btnUserManagement.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnUserManagement.addActionListener(this);
-		leftContentPanel.add(btnUserManagement);
+		pnlLeftContentPanel.add(btnUserManagement);
 		
-		btnUserInformation = new JButton(""); 
-		btnUserInformation.setBounds(10, 128, 176, 47);
+		btnUserInformation = new JButton(""); imageResourceStr.put(btnUserInformation, "/res/User Information.png");
+		btnUserInformation.setBounds(10, 152, 176, 47);
 		btnUserInformation.addActionListener(this);
 		btnUserInformation.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/User Information.png")).getImage().getScaledInstance(btnUserInformation.getWidth(), btnUserInformation.getHeight(), Image.SCALE_SMOOTH)));
 		btnUserInformation.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(btnUserInformation);
+		pnlLeftContentPanel.add(btnUserInformation);
 		
-		btnReturn = new JButton(""); 
-		btnReturn.setBounds(10, 70, 176, 47);
+		btnReturn = new JButton(""); imageResourceStr.put(btnReturn, "/res/Return.png");
+		btnReturn.setBounds(10, 83, 176, 47);
 		btnReturn.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Return.png")).getImage().getScaledInstance(btnReturn.getWidth(), btnReturn.getHeight(), Image.SCALE_SMOOTH)));
 		btnReturn.addActionListener(this);
 		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		leftContentPanel.add(btnReturn);
+		pnlLeftContentPanel.add(btnReturn);
 		
-		btnSeachrent = new JButton(""); 
+		btnSeachrent = new JButton(""); this.imageResourceStr.put(btnSeachrent, "/res/Search Rent.png");
 		btnSeachrent.setBounds(10, 11, 176, 47);
 		btnSeachrent.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Search Rent.png")).getImage().getScaledInstance(btnSeachrent.getWidth(), btnSeachrent.getHeight(), Image.SCALE_SMOOTH)));
 		btnSeachrent.addActionListener(this);
 		btnSeachrent.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		leftContentPanel.add(btnSeachrent);
+		pnlLeftContentPanel.add(btnSeachrent);
 		
-		JButton btnActivityLogs = new JButton("");
-		btnActivityLogs.setBounds(10, 366, 176, 47);
-		btnActivityLogs.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource("/res/Activity logs.png")).getImage().getScaledInstance(btnActivityLogs.getWidth(), btnActivityLogs.getHeight(), Image.SCALE_SMOOTH)));
-		btnActivityLogs.setFont(new Font("Tahoma", Font.BOLD, 12));
-		leftContentPanel.add(btnActivityLogs);
+		pnlRightContentPanel = new JPanel();
+		pnlRightContentPanel.setBounds(199, 0, 460, 424);
+		pnlHomeScreen.add(pnlRightContentPanel);
+		pnlRightContentPanel.setLayout(new CardLayout(0, 0));
 		
-		rightContentPanel = new JPanel();
-		rightContentPanel.setBounds(199, 0, 460, 424);
-		HomeScreen.add(rightContentPanel);
-		rightContentPanel.setLayout(new CardLayout(0, 0));
-		
-		JPanel SearchRentPanel = new JPanel();
+		JPanel SearchRentPanel = new JPanel();  uiRenting.mainPanel = SearchRentPanel;
 		SearchRentPanel.setBackground(new Color(27, 27, 27));
-		rightContentPanel.add(SearchRentPanel, "name_72204072661900");
+		pnlRightContentPanel.add(SearchRentPanel, "name_72204072661900");
 		SearchRentPanel.setLayout(null);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
@@ -669,7 +543,7 @@ public class Main extends JFrame implements ActionListener {
 		textField_4.setColumns(10);
 		
 		JButton btnNewButton_4 = new JButton("SEARCH"); 
-		btnNewButton_4.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_4.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_4.setForeground(Color.BLACK);
 		btnNewButton_4.setBackground(new Color(255, 163, 26));uiRenting.btnSearch = btnNewButton_4;
 		btnNewButton_4.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -698,7 +572,7 @@ public class Main extends JFrame implements ActionListener {
 		SearchRentPanel.add(lblNewLabel_22);
 		
 		JButton btnNewButton_5 = new JButton("ADD"); 
-		btnNewButton_5.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));uiRenting.btnAdd = btnNewButton_5;
+		btnNewButton_5.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));uiRenting.btnAdd = btnNewButton_5;
 		btnNewButton_5.setBackground(new Color(255, 163, 26));
 		btnNewButton_5.setForeground(new Color(27, 27, 27));
 		btnNewButton_5.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -706,7 +580,7 @@ public class Main extends JFrame implements ActionListener {
 		SearchRentPanel.add(btnNewButton_5);
 		
 		JButton btnNewButton_6 = new JButton("REMOVE"); 
-		btnNewButton_6.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_6.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_6.setBackground(new Color(255, 163, 26));
 		btnNewButton_6.setForeground(new Color(27, 27, 27));uiRenting.btnRemove = btnNewButton_6;
 		btnNewButton_6.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -714,7 +588,7 @@ public class Main extends JFrame implements ActionListener {
 		SearchRentPanel.add(btnNewButton_6);
 		
 		JButton btnNewButton_7 = new JButton("CONFIRM"); 
-		btnNewButton_7.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_7.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_7.setForeground(new Color(27, 27, 27));
 		btnNewButton_7.setBackground(new Color(255, 163, 26));uiRenting.btnConfirm = btnNewButton_7;
 		btnNewButton_7.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -738,10 +612,10 @@ public class Main extends JFrame implements ActionListener {
 		formattedTextField_3.setBounds(68, 396, 116, 20);
 		SearchRentPanel.add(formattedTextField_3);
 		
-		JPanel ReturnPanel = new JPanel();
+		JPanel ReturnPanel = new JPanel(); uiReturn.mainPanel = ReturnPanel;
 		ReturnPanel.setForeground(new Color(128, 128, 128));
 		ReturnPanel.setBackground(new Color(27, 27, 27));
-		rightContentPanel.add(ReturnPanel, "name_72224483657400");
+		pnlRightContentPanel.add(ReturnPanel, "name_72224483657400");
 		ReturnPanel.setLayout(null);
 		
 		JLabel lblNewLabel_24 = new JLabel("UserID");
@@ -772,22 +646,22 @@ public class Main extends JFrame implements ActionListener {
 		panel_4.setLayout(new BoxLayout(panel_4, BoxLayout.Y_AXIS));
 		
 		JButton btnNewButton_8 = new JButton("ENTER"); 
-		btnNewButton_8.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_8.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_8.setBackground(new Color(255, 163, 26));uiReturn.btnEnter = btnNewButton_8;
 		btnNewButton_8.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_8.setBounds(206, 19, 89, 23);
 		ReturnPanel.add(btnNewButton_8);
 		
 		JButton btnNewButton_9 = new JButton("RETURN"); 
-		btnNewButton_9.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_9.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_9.setBackground(new Color(255, 163, 26));uiReturn.btnReturn = btnNewButton_9;
 		btnNewButton_9.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_9.setBounds(361, 110, 89, 23);
 		ReturnPanel.add(btnNewButton_9);
 		
-		JPanel UserInformationPanel = new JPanel(); 
+		JPanel UserInformationPanel = new JPanel(); uiUserInfo.mainPanel = UserInformationPanel;
 		UserInformationPanel.setBackground(new Color(27, 27, 27));
-		rightContentPanel.add(UserInformationPanel, "name_72227231251400");
+		pnlRightContentPanel.add(UserInformationPanel, "name_72227231251400");
 		UserInformationPanel.setLayout(null);
 		
 		JLabel lblNewLabel_25 = new JLabel("UserID");
@@ -807,7 +681,7 @@ public class Main extends JFrame implements ActionListener {
 		UserInformationPanel.add(formattedTextField_4);
 		
 		JButton btnNewButton_10 = new JButton("ENTER"); 
-		btnNewButton_10.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_10.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_10.setBackground(new Color(255, 163, 26));uiUserInfo.btnEnter = btnNewButton_10; uiUserInfo.initActionResponse();
 		btnNewButton_10.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_10.setBounds(347, 8, 89, 23);
@@ -924,9 +798,9 @@ public class Main extends JFrame implements ActionListener {
 		scrollPane_4.setViewportView(panel_5);
 		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
 		
-		JPanel UserManagementPanel = new JPanel();
+		JPanel UserManagementPanel = new JPanel(); uiUserManagement.mainPanel = UserManagementPanel;
 		UserManagementPanel.setBackground(new Color(27, 27, 27));
-		rightContentPanel.add(UserManagementPanel, "name_72229635802400");
+		pnlRightContentPanel.add(UserManagementPanel, "name_72229635802400");
 		UserManagementPanel.setLayout(null);
 		
 		JLabel lblNewLabel_3 = new JLabel("UserID");
@@ -939,7 +813,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_3.setBounds(10, 8, 78, 20);
 		UserManagementPanel.add(lblNewLabel_3);
 		
-		fTFieldUsermngUserID = new JFormattedTextField(this.maskFUserID);
+		JFormattedTextField fTFieldUsermngUserID = new JFormattedTextField(this.maskFUserID); uiUserManagement.ftfID = fTFieldUsermngUserID;
 		fTFieldUsermngUserID.setBackground(new Color(128, 128, 128));
 		fTFieldUsermngUserID.setBounds(89, 8, 122, 20);
 		UserManagementPanel.add(fTFieldUsermngUserID);
@@ -954,14 +828,14 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_4.setBounds(10, 32, 78, 20);
 		UserManagementPanel.add(lblNewLabel_4);
 		
-		tFieldUsermngUserName = new JTextField();
+		JTextField tFieldUsermngUserName = new JTextField(); uiUserManagement.tfName = tFieldUsermngUserName;
 		tFieldUsermngUserName.setBackground(new Color(128, 128, 128));
 		tFieldUsermngUserName.setBounds(89, 32, 122, 20);
 		UserManagementPanel.add(tFieldUsermngUserName);
 		tFieldUsermngUserName.setColumns(10);
 		
-		btnUsermngSearch = new JButton("Search");
-		btnUsermngSearch.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		JButton btnUsermngSearch = new JButton("Search"); uiUserManagement.btnSearch = btnUsermngSearch;
+		btnUsermngSearch.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngSearch.setBackground(new Color(255, 163, 26));
 		btnUsermngSearch.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnUsermngSearch.setBounds(221, 3, 114, 29);
@@ -970,48 +844,41 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		
-		scrPanelUsermng = new JPanel();
+		JPanel scrPanelUsermng = new JPanel(); uiUserManagement.panel = scrPanelUsermng;
 		scrPanelUsermng.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.GRAY, null, null, null));
 		scrPanelUsermng.setBackground(new Color(128, 128, 128));
 		
 		
 		
-		JScrollPane scrollPane = new JScrollPane(scrPanelUsermng);
+		JScrollPane scrollPane = new JScrollPane(scrPanelUsermng); uiUserManagement.scrollPane = scrollPane;
 		scrollPane.setViewportBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBounds(10, 83, 440, 330);
+		scrollPane.setBounds(10, 106, 440, 307);
 		UserManagementPanel.add(scrollPane);
 		scrollPane.setViewportView(scrPanelUsermng);
 		scrPanelUsermng.setLayout(new BoxLayout(scrPanelUsermng, BoxLayout.Y_AXIS));
 		
-		btnUsermngUnregis = new JButton("UNREGISTER");
-		btnUsermngUnregis.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		JButton btnUsermngUnregis = new JButton("UNREGISTER"); uiUserManagement.btnUnreg = btnUsermngUnregis;
+		btnUsermngUnregis.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngUnregis.setBackground(new Color(255, 163, 26));
 		btnUsermngUnregis.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngUnregis.setBounds(345, 3, 115, 29);
+		btnUsermngUnregis.setBounds(10, 72, 115, 29);
 		btnUsermngUnregis.addActionListener(this);
 		UserManagementPanel.add(btnUsermngUnregis);
 		
-		btnUsermngShowAll = new JButton("Show All");
-		btnUsermngShowAll.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		JButton btnUsermngShowAll = new JButton("Show All"); uiUserManagement.btnShowAll = btnUsermngShowAll;
+		btnUsermngShowAll.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngShowAll.setBackground(new Color(255, 163, 26));
 		btnUsermngShowAll.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngShowAll.setBounds(221, 43, 114, 29);
+		btnUsermngShowAll.setBounds(346, 3, 114, 29);
 		btnUsermngShowAll.addActionListener(this);
 		UserManagementPanel.add(btnUsermngShowAll);
-		
-		btnUsermngModify = new JButton("MODIFY");
-		btnUsermngModify.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
-		btnUsermngModify.setBackground(new Color(255, 163, 26));
-		btnUsermngModify.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngModify.setBounds(345, 43, 115, 29);
-		UserManagementPanel.add(btnUsermngModify);
 		//scrPanelUsermng.setBounds(scrollPane.getBounds());
 		
 		
-		JPanel BookManagementPanel = new JPanel();
+		JPanel BookManagementPanel = new JPanel(); bookManagmentUI.mainPanel = BookManagementPanel;
 		BookManagementPanel.setBackground(new Color(27, 27, 27));
-		rightContentPanel.add(BookManagementPanel, "name_72232200085800");
+		pnlRightContentPanel.add(BookManagementPanel, "name_72232200085800");
 		BookManagementPanel.setLayout(null);
 		
 		bookManagmentUI.dtbConn = this.dtbConn;
@@ -1021,7 +888,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		JScrollPane scrollPaneBookMng = new JScrollPane(panel_1); bookManagmentUI.scrollPane = scrollPaneBookMng;
-		scrollPaneBookMng.setBounds(10, 160, 440, 253);
+		scrollPaneBookMng.setBounds(10, 149, 440, 263);
 		BookManagementPanel.add(scrollPaneBookMng);
 		
 		
@@ -1113,24 +980,24 @@ public class Main extends JFrame implements ActionListener {
 		BookManagementPanel.add(formattedTextField_1);
 		
 		JButton btnNewButton = new JButton("CREATE"); 
-		btnNewButton.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton.setBackground(new Color(255, 163, 26));bookManagmentUI.btnCreate = btnNewButton;
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton.setBounds(361, 8, 89, 23);
+		btnNewButton.setBounds(235, 4, 89, 23);
 		BookManagementPanel.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("DELETE"); 
-		btnNewButton_1.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_1.setBackground(new Color(255, 163, 26));bookManagmentUI.btnDelete = btnNewButton_1;
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_1.setBounds(266, 44, 108, 23);
+		btnNewButton_1.setBounds(346, 4, 89, 23);
 		BookManagementPanel.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("SEARCH"); 
-		btnNewButton_2.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_2.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_2.setBackground(new Color(255, 163, 26));bookManagmentUI.btnSearch = btnNewButton_2;
 		btnNewButton_2.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_2.setBounds(266, 8, 89, 23);
+		btnNewButton_2.setBounds(237, 39, 89, 23);
 		BookManagementPanel.add(btnNewButton_2);
 		
 		JLabel lblNewLabel_19 = new JLabel("QTY:"); 
@@ -1144,30 +1011,30 @@ public class Main extends JFrame implements ActionListener {
 		BookManagementPanel.add(lblNewLabel_19);
 		
 		JButton btnNewButton_3 = new JButton("ADD"); 
-		btnNewButton_3.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_3.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_3.setBackground(new Color(255, 163, 26));bookManagmentUI.btnAdd = btnNewButton_3;
 		btnNewButton_3.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_3.setBounds(292, 117, 82, 20);
 		BookManagementPanel.add(btnNewButton_3);
 		
 		JButton btnNewButton_3_1 = new JButton("SUB"); 
-		btnNewButton_3_1.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnNewButton_3_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_3_1.setBackground(new Color(255, 163, 26));bookManagmentUI.btnSubtract = btnNewButton_3_1;
 		btnNewButton_3_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_3_1.setBounds(378, 117, 82, 20);
 		BookManagementPanel.add(btnNewButton_3_1);
 		
-		JButton btnNewButton_11 = new JButton("SHOW ALL"); 
-		btnNewButton_11.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));bookManagmentUI.btnShowAll = btnNewButton_11;
+		JButton btnNewButton_11 = new JButton("ALL"); 
+		btnNewButton_11.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));bookManagmentUI.btnShowAll = btnNewButton_11;
 		btnNewButton_11.setBackground(new Color(255, 163, 26));
 		btnNewButton_11.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_11.setBounds(266, 82, 108, 23);
+		btnNewButton_11.setBounds(237, 70, 87, 23);
 		BookManagementPanel.add(btnNewButton_11);
 		
-		RegisterPanel = new JPanel();
+		RegisterPanel = new JPanel(); uiUserRegis.mainPanel = RegisterPanel;
 		RegisterPanel.setForeground(new Color(255, 255, 255));
 		RegisterPanel.setBackground(new Color(27, 27, 27));
-		rightContentPanel.add(RegisterPanel, "name_72244918873200");
+		pnlRightContentPanel.add(RegisterPanel, "name_72244918873200");
 		RegisterPanel.setLayout(null);
 		
 		JLabel lblNewLabel_1 = new JLabel("User Registration");
@@ -1304,7 +1171,7 @@ public class Main extends JFrame implements ActionListener {
 		RegisterPanel.add(lblNewLabel_14);
 		
 		btnRegistration = new JButton("Register"); 
-		btnRegistration.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		btnRegistration.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnRegistration.setBackground(new Color(255, 163, 26));uiUserRegis.btnRegister = btnRegistration; btnRegistration.addActionListener(uiUserRegis);
 		btnRegistration.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnRegistration.setBounds(194, 385, 103, 28);
@@ -1351,17 +1218,16 @@ public class Main extends JFrame implements ActionListener {
 		formattedTextField_5_1_2.setBounds(134, 240, 278, 20);
 		RegisterPanel.add(formattedTextField_5_1_2);
 		
-		JPanel ActivityLogsPanel = new JPanel();
-		ActivityLogsPanel.setBackground(new Color(192, 192, 192));
-		rightContentPanel.add(ActivityLogsPanel, "name_72247065996200");
-		
 		uiReturn.windowRef = this;
-		
-		
+		uiLogin.windowRef = this;
+		uiLogin.panel = (JPanel) this.getContentPane();
+		uiLogin.dtbConn = dtbConn;
+		uiUserManagement.dtbConn = dtbConn;
 		bookManagmentUI.initActionListener();
 		uiRenting.initActionResponse();
 		uiReturn.initActionResponse();
-		
+		uiLogin.initActionListener();
+		uiUserManagement.initActionListener();
 		
 	}
 }

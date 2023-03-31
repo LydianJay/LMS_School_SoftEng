@@ -1,6 +1,8 @@
 package ui;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,10 +22,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
+import main.ComponentResize;
 
-public class UIRenting implements ActionListener {
+public class UIRenting implements ActionListener, ComponentResize{
 	public static JFrame windowRef;
-	public static JPanel panel1, panel2;
+	public static JPanel panel1, panel2, mainPanel;
 	public static Connection dtbConn;
 	public static JTextField tfBookName, tfAuthor, tfCategory;
 	public static JFormattedTextField ftfUserID;
@@ -32,6 +35,31 @@ public class UIRenting implements ActionListener {
 	private static ArrayList<JCheckBox> searchQuery = new ArrayList<JCheckBox>();
 	private static ArrayList<JCheckBox> rentList = new ArrayList<JCheckBox>();
 	public static MaskFormatter idFormatter;
+	
+	@Override
+	public void resizeCall(Dimension old, Dimension n) {
+		
+		double rX = n.getWidth() / old.getWidth();
+		double rY = n.getWidth() / old.getWidth();
+		
+
+		
+		
+		for(Component c : mainPanel.getComponents()) {
+			
+			Dimension newSize = new Dimension( (int)(c.getWidth() * rX), (int)(c.getHeight() * rY));
+			
+			c.setSize(newSize);
+			int x = (int) (c.getX() * rX), y = (int) (c.getY() * rY);
+			c.setLocation(x, y);
+			c.revalidate();
+			c.repaint();
+			
+		}
+		
+		
+	}
+	
 	
 	public void initActionResponse() {
 		btnSearch.addActionListener(this);

@@ -1,6 +1,9 @@
 package ui;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,13 +20,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import javax.swing.text.MaskFormatter;
-
-public class UIReturn implements ActionListener{
+import main.ComponentResize;
+public class UIReturn implements ActionListener, ComponentResize{
 	public static JButton btnEnter, btnReturn;
 	public static JFormattedTextField ftfID;
 	public static Connection dtbConn;
 	public static JScrollPane scrollPane;
-	public static JPanel panel;
+	public static JPanel panel, mainPanel;
 	public static MaskFormatter idFormatter;
 	public static JFrame windowRef;
 	private static ArrayList<JCheckBox> checkBox = new ArrayList<JCheckBox>();
@@ -155,6 +158,33 @@ public class UIReturn implements ActionListener{
 	
 	public void initActionResponse() {
 		btnEnter.addActionListener(this); btnReturn.addActionListener(this);
+	}
+
+
+
+
+	@Override
+	public void resizeCall(Dimension old, Dimension n) {
+		
+		double rX = n.getWidth() / old.getWidth();
+		double rY = n.getWidth() / old.getWidth();
+		
+
+		
+		
+		for(Component c : mainPanel.getComponents()) {
+			
+			Dimension newSize = new Dimension( (int)(c.getWidth() * rX), (int)(c.getHeight() * rY));
+			
+			c.setSize(newSize);
+			int x = (int) (c.getX() * rX), y = (int) (c.getY() * rY);
+			c.setLocation(x, y);
+			c.revalidate();
+			c.repaint();
+			
+		}
+		
+		
 	}
 	
 	
