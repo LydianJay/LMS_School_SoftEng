@@ -1,6 +1,8 @@
 package ui;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,23 +21,46 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
-
+import main.ComponentResize;
 
 // container for UI elements
 
-public class UIBookManagement implements ActionListener {
+public class UIBookManagement implements ActionListener, ComponentResize{
 	
 	public static JTextField tfName, tfAuthor, tfCategory;
 	public static JButton btnSearch, btnCreate, btnDelete, btnAdd, btnSubtract, btnShowAll;
 	public static JFormattedTextField ftfID, ftfYear;
 	public static Connection dtbConn;
 	public static JScrollPane scrollPane;
-	public static JPanel panel;
+	public static JPanel panel, mainPanel;
 	public static MaskFormatter idFormatter, yearFormatter;
 	public static JFrame windowRef;
 	private static ArrayList<JCheckBox> checkBox = new ArrayList<JCheckBox>();
 	private static int numOfBookEntries = -1;
 	
+	@Override
+	public void resizeCall(Dimension old, Dimension n) {
+		
+		double rX = n.getWidth() / old.getWidth();
+		double rY = n.getWidth() / old.getWidth();
+		
+
+		
+		
+		for(Component c : mainPanel.getComponents()) {
+			
+			Dimension newSize = new Dimension( (int)(c.getWidth() * rX), (int)(c.getHeight() * rY));
+			
+			c.setSize(newSize);
+			int x = (int) (c.getX() * rX), y = (int) (c.getY() * rY);
+			c.setLocation(x, y);
+			c.revalidate();
+			c.repaint();
+			
+		}
+		
+		
+	}
 	
 	
 	public UIBookManagement(){
@@ -104,6 +129,10 @@ public class UIBookManagement implements ActionListener {
 	
 	private static void showAllActionResponse() {
 		checkBox.clear();
+		panel.removeAll();
+		panel.revalidate();
+		panel.repaint();
+		
 		
 		try {
 			Statement st = dtbConn.createStatement();

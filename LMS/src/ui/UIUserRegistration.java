@@ -1,5 +1,7 @@
 package ui;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -13,13 +15,16 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
+import main.ComponentResize;
 
-public class UIUserRegistration implements ActionListener {
+
+public class UIUserRegistration implements ActionListener, ComponentResize{
 	
-	
+	public static JPanel mainPanel;
 	public static JButton btnRegister;
 	public static JFormattedTextField ftfDate, ftfMonth, ftfYear, ftfContactNo;
 	public static JTextField tfName, tfAddress, tfEmail, tfPass;
@@ -29,6 +34,32 @@ public class UIUserRegistration implements ActionListener {
 	public static MaskFormatter dateFormatter, monthFormatter, yearFormatter, contactNoFormatter;
 	public static ButtonGroup bgGender = new ButtonGroup(), bgRole = new ButtonGroup();
 	private static int userCount = -1;
+	
+	
+	@Override
+	public void resizeCall(Dimension old, Dimension n) {
+		
+		double rX = n.getWidth() / old.getWidth();
+		double rY = n.getWidth() / old.getWidth();
+		
+
+		
+		
+		for(Component c : mainPanel.getComponents()) {
+			
+			Dimension newSize = new Dimension( (int)(c.getWidth() * rX), (int)(c.getHeight() * rY));
+			
+			c.setSize(newSize);
+			int x = (int) (c.getX() * rX), y = (int) (c.getY() * rY);
+			c.setLocation(x, y);
+			c.revalidate();
+			c.repaint();
+			
+		}
+		
+		
+	}
+	
 	
 	public UIUserRegistration(){
 			
