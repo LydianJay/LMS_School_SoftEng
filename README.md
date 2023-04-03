@@ -1,6 +1,6 @@
-# Library Management System
-# Surigao Del Norte State University | BSCS - 3A (2023)
-# Requirement for Software Engineering 2
+## Library Management System
+## Surigao Del Norte State University | BSCS - 3A (2023)
+Requirement for Software Engineering 2
 
 
 # Login Page
