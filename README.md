@@ -4,20 +4,20 @@ Requirement for Software Engineering 2
 
 
 # Login Page
-![image](https://user-images.githubusercontent.com/63202126/226173098-feca7253-caef-40b1-b2ae-fd357cf57d42.png)
+![image](https://user-images.githubusercontent.com/63202126/231918628-aa3c0812-3a71-4512-8ceb-24963ce69ce0.png)
 # Main Page / Search Rent
 
-![image](https://user-images.githubusercontent.com/63202126/226173148-f52e62ee-ee04-434f-90ae-19dc16d4c923.png)
+![image](https://user-images.githubusercontent.com/63202126/231918784-8ca5e967-ed16-4ac1-a964-8029f433a6d8.png)
 # Return Page
-![image](https://user-images.githubusercontent.com/63202126/226173167-6ed25936-1369-470d-8644-8ebd57d72f7e.png)
+![image](https://user-images.githubusercontent.com/63202126/231918892-d3a70d31-a8a3-4d19-9a43-912f5bbdd196.png)
 # User Info Page
-![image](https://user-images.githubusercontent.com/63202126/226173176-4bf5fed3-4925-4032-98a6-e793f248a2ad.png)
+![image](https://user-images.githubusercontent.com/63202126/231919012-282d7f8b-c831-4fce-a35d-7ad73862617a.png)
 # User Management Page
-![image](https://user-images.githubusercontent.com/63202126/226173196-891346ae-330a-4f79-b372-c3502e18ab57.png)
+![image](https://user-images.githubusercontent.com/63202126/231919093-fd8fdb4e-a1f3-46c5-b05c-14276ca324fe.png)
 # Book Management Page
-![image](https://user-images.githubusercontent.com/63202126/226173211-006bbf47-809f-40d8-bdf0-455e262470a8.png)
+![image](https://user-images.githubusercontent.com/63202126/231919162-1e7435cd-dd67-4329-9dac-f76009a694f7.png)
 # Registration Page
-![image](https://user-images.githubusercontent.com/63202126/226173221-8dd895e6-b6d2-4c30-a450-e7b4b85abd85.png)
+![image](https://user-images.githubusercontent.com/63202126/231919199-de7a32c9-e552-41ee-baed-ac61966b4f37.png)
 
 # Installation
 Download the latest version of the jar file
