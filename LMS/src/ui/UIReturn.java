@@ -133,8 +133,8 @@ public class UIReturn implements ActionListener, ComponentResize{
 					String stm = "DELETE FROM ownershipinfo WHERE bookID = " + bookID + " AND userID = " + userID;
 					
 					st.executeUpdate(stm);
-					
-					
+					String stm2 = "UPDATE bookinfo SET bookQTY = bookQTY + 1 WHERE bookID = " + bookID + ";";
+					st.executeUpdate(stm2);
 				}
 				
 			}

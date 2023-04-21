@@ -166,6 +166,7 @@ public class UIBookManagement implements ActionListener, ComponentResize{
 		
 		
 		boolean success = true;
+		int selectedCount = 0;
 		try {
 			Statement st = dtbConn.createStatement();
 			
@@ -176,7 +177,7 @@ public class UIBookManagement implements ActionListener, ComponentResize{
 				
 				if(j.isSelected()) {
 					
-					
+					selectedCount++;
 					String bookID = j.getText().substring(0, j.getText().indexOf("NAME: ")).replaceAll("[^0-9]", "");
 					String stm;
 					if(toAdd) {
@@ -199,8 +200,11 @@ public class UIBookManagement implements ActionListener, ComponentResize{
 			success = false;
 			e.printStackTrace();
 		}
-		
-		if(success) JOptionPane.showMessageDialog(windowRef, "Update Successfuly!"); else JOptionPane.showMessageDialog(windowRef, "Update was not successful!");
+		if(selectedCount <= 0) {
+			JOptionPane.showMessageDialog(windowRef, "No selected Books!");
+		}
+		else
+			if(success) JOptionPane.showMessageDialog(windowRef, "Update Successfuly!"); else JOptionPane.showMessageDialog(windowRef, "Update was not successful!");
 		
 		checkBox.clear();
 		panel.removeAll();
@@ -394,7 +398,7 @@ public class UIBookManagement implements ActionListener, ComponentResize{
 		
 		String bookName = "'" + tfName.getText() + "'", bookAuthor = "'" + tfAuthor.getText() + "'", bookCat = "'" + tfCategory.getText() + "'", bookID = generateID(), bookYear = ftfYear.getText();
 		boolean createSuccess = true;
-		boolean isValid = !(bookName.isEmpty() && bookAuthor.isEmpty() && bookCat.isEmpty() && bookYear.isEmpty());
+		boolean isValid = !(tfName.getText().isEmpty() || tfAuthor.getText().isEmpty() || tfCategory.getText().isEmpty() || ftfYear.getText().isEmpty());
 		String str = null;
 		if(isValid) {
 			
@@ -407,8 +411,8 @@ public class UIBookManagement implements ActionListener, ComponentResize{
 				
 			} catch (SQLException e1) {
 				
-				System.out.println("SQL_ERROR: " + e1.getMessage());
-				System.out.println("SQL_STATEMENT: " + str);
+				e1.printStackTrace();
+				System.out.println("SQL STATEMENT: " + str);
 				createSuccess = false;
 				JOptionPane.showMessageDialog(windowRef, "SQL Failed");
 				

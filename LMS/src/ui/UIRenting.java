@@ -120,7 +120,13 @@ public class UIRenting implements ActionListener, ComponentResize{
 		try {
 			Statement st = dtbConn.createStatement();
 			String userID = ftfUserID.getText();
+			
 			for (JCheckBox j : rentList) {
+				
+				if(!j.isSelected()) {
+					continue;
+				}
+				
 				
 				String bookID = j.getText().substring(0, j.getText().indexOf("NAME: ")).replaceAll("[^0-9]", "");
 				
@@ -191,8 +197,6 @@ public class UIRenting implements ActionListener, ComponentResize{
 				ir.remove();
 			}
 		}
-		
-		
 		
 		panel1.revalidate();
 		panel1.repaint();

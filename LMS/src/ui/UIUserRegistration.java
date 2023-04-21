@@ -137,7 +137,7 @@ public class UIUserRegistration implements ActionListener, ComponentResize{
 			if(s.next()) {
 				
 				String id = String.valueOf(s.getLong("id"));
-				st.executeUpdate("DELETE FROM deleted_ids WHERE id == " + id);
+				st.executeUpdate("DELETE FROM deleted_ids WHERE id = " + id + " AND idType = 1;");
 				return id;
 			}
 			
@@ -180,7 +180,7 @@ public class UIUserRegistration implements ActionListener, ComponentResize{
 		
 		userName = "'" + tfName.getText() + "'";
 		address = "'" + tfAddress.getText() + "'";
-		email = "'" +tfEmail.getText() + "'";
+		email = "'" + tfEmail.getText() + "'";
 		bday = ftfDate.getText() + ftfMonth.getText() + ftfYear.getText();
 		conNum = "'" + ftfContactNo.getText() + "'";
 		password = "'" + tfPass.getText() + "'";
@@ -188,8 +188,18 @@ public class UIUserRegistration implements ActionListener, ComponentResize{
 		role = rbAdmin.isSelected() ? "1" : rbClient.isSelected() ? "0" : "1";
 		
 		
-		boolean isValid = !(userName.isEmpty() && address.isEmpty() && email.isEmpty() && bday.isEmpty() && conNum.isEmpty() && password.isEmpty() && gender.isEmpty() && role.isEmpty());
+		boolean checkEmptyFields = !(tfName.getText().isEmpty() || tfAddress.getText().isEmpty() || tfEmail.getText().isEmpty() || tfPass.getText().isEmpty());
+		boolean checkRadioButton = !( (!rbMale.isSelected() && !rbFemale.isSelected()) || (!rbAdmin.isSelected() && !rbClient.isSelected()) );
 		
+		int date  = Integer.valueOf(ftfDate.getText());
+		int month = Integer.valueOf(ftfMonth.getText());
+		int year = Integer.valueOf(ftfYear.getText());
+		
+		
+		boolean checkBirthDate = (date > 0 && date <= 31) && (month > 0 && month <= 12) && (year > 1000);
+		
+		
+		boolean isValid = checkEmptyFields && checkRadioButton && checkBirthDate;
 		
 		if(isValid) {
 			
@@ -211,7 +221,7 @@ public class UIUserRegistration implements ActionListener, ComponentResize{
 			} catch (SQLException e1) {
 				isSuccess = false;
 				e1.printStackTrace();
-				JOptionPane.showMessageDialog(windowRef, "Failed");
+				JOptionPane.showMessageDialog(windowRef, "SQL Fail");
 				
 				
 			}
@@ -226,7 +236,18 @@ public class UIUserRegistration implements ActionListener, ComponentResize{
 			
 		}
 		else {
-			JOptionPane.showMessageDialog(windowRef, "Empty Fields Detected!!!");
+			if(!checkEmptyFields) {
+				JOptionPane.showMessageDialog(windowRef, "Empty Fields Detected!!!");
+			}
+			
+			if(!checkBirthDate) {
+				JOptionPane.showMessageDialog(windowRef, "Invalid Date!");
+			}
+			
+			if(!checkRadioButton) {
+				JOptionPane.showMessageDialog(windowRef, "No selection for role or gender!");
+			}
+			
 		}
 		
 		
