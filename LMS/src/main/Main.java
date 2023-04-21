@@ -308,7 +308,7 @@ public class Main extends JFrame implements ActionListener {
 		uiUserRegis.windowRef = this;
 		uiUserManagement.windowRef = this;
 		setEnabled(true);
-		setTitle("Library Management System - v1.3 [ALPHA]");
+		setTitle("Library Management System - v1.4 [ALPHA]");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		setBounds(100, 100, 685, 473);

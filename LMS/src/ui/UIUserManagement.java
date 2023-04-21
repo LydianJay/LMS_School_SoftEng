@@ -111,10 +111,11 @@ public class UIUserManagement implements ActionListener, ComponentResize{
 		
 		
 		boolean success = true;
+		int selectedCount = 0;
 		for(JCheckBox j : checkBox) {
 			
 			if(j.isSelected()) {
-				
+				selectedCount++;
 				try {
 					Statement st = dtbConn.createStatement();
 					
@@ -146,7 +147,13 @@ public class UIUserManagement implements ActionListener, ComponentResize{
 			
 			
 		}
-		if(success) JOptionPane.showMessageDialog(windowRef, "Deleted Successfuly!"); else JOptionPane.showMessageDialog(windowRef, "Delete Failed!");
+		
+		if(selectedCount <= 0) {
+			JOptionPane.showMessageDialog(windowRef, "No selected User!");
+		}
+		else
+			if(success) JOptionPane.showMessageDialog(windowRef, "Deleted Successfuly!"); else JOptionPane.showMessageDialog(windowRef, "Delete Failed!");
+		
 		panel.removeAll();
 		panel.revalidate();
 		panel.repaint();
