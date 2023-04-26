@@ -88,16 +88,16 @@ import java.util.HashMap;
 
 public class Main extends JFrame implements ActionListener {
 	
-	private static UIBookManagement bookManagmentUI = new UIBookManagement();
-	private static UIRenting uiRenting = new UIRenting();
-	private static UIReturn uiReturn = new UIReturn();
-	private static UIUserInfo uiUserInfo = new UIUserInfo();
-	private static UIUserRegistration uiUserRegis = new UIUserRegistration();
-	private static UILogin uiLogin = new UILogin();
-	private static UIUserManagement uiUserManagement = new UIUserManagement();
+	private static UIBookManagement bookManagmentUI = new UIBookManagement(); 	// Instance of UI for Book Management Panel
+	private static UIRenting uiRenting = new UIRenting();						// Instance of UI for Renting Panel
+	private static UIReturn uiReturn = new UIReturn();							// Instance of UI for Return Panel
+	private static UIUserInfo uiUserInfo = new UIUserInfo();					// Instance of UI for User Info Panel
+	private static UIUserRegistration uiUserRegis = new UIUserRegistration();   // Instance of UI for User Registration
+	private static UILogin uiLogin = new UILogin();								// Instance of UI for Login
+	private static UIUserManagement uiUserManagement = new UIUserManagement();	// Instance of UI for User Management
+	private static Main reference;
 	
-	
-	private static final int PNL_SEARCH = 0, PNL_RETURN = 1, PNL_USER_INFO = 2, PNL_USER_MNG = 3, PNL_BOOK_MNG = 4, PNL_REGIS = 5;
+	private static final int PNL_SEARCH = 0, PNL_RETURN = 1, PNL_USER_INFO = 2, PNL_USER_MNG = 3, PNL_BOOK_MNG = 4, PNL_REGIS = 5; // current panel. EX: PNL_SEARCH the users currently is the search panel
 	
 	private static String dtbUrl = "jdbc:mysql://localhost:3306/lms_database", dtbUsername = "root", dtbPassword = "";
 	private static Connection dtbConn;
@@ -120,10 +120,14 @@ public class Main extends JFrame implements ActionListener {
 	private JButton btnUserInformation;
 	private JPanel pnlLeftContentPanel;
 	private Dimension currentSize;
-	private static Dimension defaultSize;
-	private static Dimension maximizedSize;
+
 	
-	
+	/*
+	 * This method moves the current panel to the selected panel
+	 * for example when the user clicks Rent/Search button the panel changes to the Rent/Search panel
+	 * @param idx - the index of the panel. Possible values PNL_SEARCH, PLN_RETURN...
+	 * @return - none
+	 */
 	private void movePanel(int idx) {
 		
 		
@@ -135,34 +139,37 @@ public class Main extends JFrame implements ActionListener {
 	
 	
 	
-	
+	/*
+	 * Button handler
+	 * Check what button is pressed
+	 */
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		JButton b = (JButton)(e.getSource());
+		JButton b = (JButton)(e.getSource()); // get the button that was pressed
 		
-		if(b == this.btnRegisterSelection) {
+		if(b == this.btnRegisterSelection) {  // if the button is the register button we move the change the panel to the register panel
 			CardLayout c = (CardLayout)(this.pnlRightContentPanel.getLayout());
-			movePanel(PNL_REGIS);
+			movePanel(PNL_REGIS);// move panel to the registration panel
 		}
 		
 		
 		
-		else if(b == this.btnUserManagement) {
+		else if(b == this.btnUserManagement) { // move panel if User Management Button is pressed
 			movePanel(PNL_USER_MNG);
 		}
-		else if(b == this.btnBookManagement) {
+		else if(b == this.btnBookManagement) { // same here it moves the panel to Book Management if the book management button is pressed
 			movePanel(PNL_BOOK_MNG);
 		}
-		else if(b == this.btnSeachrent) {
+		else if(b == this.btnSeachrent) { // search button
 			movePanel(PNL_SEARCH);
 		}
-		else if(b == this.btnReturn) {
+		else if(b == this.btnReturn) { // return button
 			movePanel(PNL_RETURN);
 		}
 		
-		else if(b == this.btnUserInformation) {
+		else if(b == this.btnUserInformation) { // user information button
 			movePanel(PNL_USER_INFO);
 		}
 		
@@ -170,7 +177,9 @@ public class Main extends JFrame implements ActionListener {
 	}
 	
 	
-	
+	/*
+	 * Resizes the UI component when the window is drag/resized 
+	 */
 	public static void resizeAComponent(Component c, Dimension old, Dimension n) {
 		
 		double rX = n.getWidth() / old.getWidth();
@@ -178,7 +187,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		
-		Dimension newSize = new Dimension( (int)(c.getWidth() * rX), (int)(c.getHeight() * rY));
+		Dimension newSize = new Dimension( (int)(c.getWidth() * rX), (int)(c.getHeight() * rY)); // calculate the appropriate dimension
 		
 		c.setSize(newSize);
 		int x = (int) (c.getX() * rX), y = (int) (c.getY() * rY);
@@ -202,15 +211,15 @@ public class Main extends JFrame implements ActionListener {
 				x = (int) (d.getX() * rX); 
 				y = (int) (d.getY() * rY);
 				d.setLocation(x, y);
-				//System.out.println(d.getClass().toString());
+				
 				if(Main.imageResourceStr.containsKey(d)) {
 					JButton j = (JButton) d;
 					String res = Main.imageResourceStr.get(d);
-					
-					j.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource(res)).getImage().getScaledInstance(j.getWidth(), j.getHeight(), Image.SCALE_SMOOTH)));
+					// the image to scaled after it is resized
+					j.setIcon( new ImageIcon(new ImageIcon(Main.class.getResource(res)).getImage().getScaledInstance(j.getWidth(), j.getHeight(), Image.SCALE_SMOOTH))); 
 				}
 				
-				d.revalidate();
+				d.revalidate(); // refresh the panel to see the changes
 				d.repaint();
 			}
 			
@@ -229,8 +238,8 @@ public class Main extends JFrame implements ActionListener {
 		
 		try {
 			
-			dtbConn = DriverManager.getConnection(dtbUrl, dtbUsername, dtbPassword);
-			uiRenting.dtbConn = dtbConn;
+			dtbConn = DriverManager.getConnection(dtbUrl, dtbUsername, dtbPassword); // get the connection to our SQL database
+			uiRenting.dtbConn = dtbConn; // sets the reference to our database connection for each UI component
 			uiReturn.dtbConn = dtbConn;
 			uiUserInfo.dtbConn = dtbConn;
 			uiUserRegis.dtbConn = dtbConn;
@@ -252,10 +261,11 @@ public class Main extends JFrame implements ActionListener {
 			public void run() {
 				try {
 					Main frame = new Main();
+					
 					frame.setVisible(true);
 					
 					frame.addComponentListener(
-							new ComponentAdapter() {
+							new ComponentAdapter() { // for resizing
 								
 								public void componentResized(ComponentEvent e) {
 									
@@ -293,11 +303,20 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 	}
-
+	
+	public static Main getReference() {
+		return reference;
+	}
+	
 	/**
 	 * Create the frame.
 	 */
 	@SuppressWarnings("static-access")
+	/*
+	 * 
+	 * Creation of buttons, panels, textbox, textfields etc.. are done here
+	 * 
+	 */
 	public Main() {
 		
 		
@@ -308,16 +327,16 @@ public class Main extends JFrame implements ActionListener {
 		uiUserRegis.windowRef = this;
 		uiUserManagement.windowRef = this;
 		setEnabled(true);
-		setTitle("Library Management System - v1.4 [ALPHA]");
+		setTitle("Library Management System - v1.0 [BETA]");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		setBounds(100, 100, 685, 473);
+		setBounds(100, 100, 688, 478);
 		currentSize = this.getSize();
-		defaultSize = new Dimension(this.getSize());
-		setResizable(true);
+		
+		setResizable(false);
 		
 		
-		
+		reference = this;
 		
 		try {
 			this.maskFUserID = new MaskFormatter("##########");
@@ -481,7 +500,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane_1.setBounds(10, 87, 440, 133);
+		scrollPane_1.setBounds(10, 165, 366, 97);
 		SearchRentPanel.add(scrollPane_1);
 		
 		JPanel panel_2 = new JPanel(); 
@@ -495,14 +514,14 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_15.setBackground(new Color(255, 163, 26));
 		lblNewLabel_15.setForeground(new Color(27, 27, 27));
 		lblNewLabel_15.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_15.setBounds(10, 9, 76, 20);
+		lblNewLabel_15.setBounds(10, 52, 76, 20);
 		SearchRentPanel.add(lblNewLabel_15);
 		
 		JTextField textField = new JTextField(); 
 		textField.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		textField.setBackground(new Color(128, 128, 128));
 		textField.setForeground(new Color(27, 27, 27));uiRenting.tfBookName = textField;
-		textField.setBounds(86, 9, 154, 20);
+		textField.setBounds(86, 52, 154, 20);
 		SearchRentPanel.add(textField);
 		textField.setColumns(10);
 		
@@ -513,14 +532,14 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_20.setOpaque(true);
 		lblNewLabel_20.setForeground(new Color(27, 27, 27));
 		lblNewLabel_20.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_20.setBounds(10, 34, 76, 20);
+		lblNewLabel_20.setBounds(10, 77, 76, 20);
 		SearchRentPanel.add(lblNewLabel_20);
 		
 		JTextField textField_3 = new JTextField(); 
 		textField_3.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		textField_3.setBackground(new Color(128, 128, 128));
 		textField_3.setForeground(new Color(27, 27, 27));uiRenting.tfCategory = textField_3;
-		textField_3.setBounds(86, 34, 154, 20);
+		textField_3.setBounds(86, 77, 154, 20);
 		SearchRentPanel.add(textField_3);
 		textField_3.setColumns(10);
 		
@@ -531,14 +550,14 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_21.setOpaque(true);
 		lblNewLabel_21.setForeground(new Color(27, 27, 27));
 		lblNewLabel_21.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_21.setBounds(10, 60, 76, 20);
+		lblNewLabel_21.setBounds(10, 103, 76, 20);
 		SearchRentPanel.add(lblNewLabel_21);
 		
 		JTextField textField_4 = new JTextField(); 
 		textField_4.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		textField_4.setForeground(new Color(27, 27, 27));
 		textField_4.setBackground(new Color(128, 128, 128));uiRenting.tfAuthor = textField_4;
-		textField_4.setBounds(86, 60, 154, 20);
+		textField_4.setBounds(86, 103, 154, 20);
 		SearchRentPanel.add(textField_4);
 		textField_4.setColumns(10);
 		
@@ -547,12 +566,12 @@ public class Main extends JFrame implements ActionListener {
 		btnNewButton_4.setForeground(Color.BLACK);
 		btnNewButton_4.setBackground(new Color(255, 163, 26));uiRenting.btnSearch = btnNewButton_4;
 		btnNewButton_4.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_4.setBounds(250, 7, 89, 23);
+		btnNewButton_4.setBounds(261, 51, 89, 23);
 		SearchRentPanel.add(btnNewButton_4);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
 		scrollPane_2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane_2.setBounds(10, 260, 440, 116);
+		scrollPane_2.setBounds(10, 290, 366, 86);
 		SearchRentPanel.add(scrollPane_2);
 		
 		JPanel panel_3 = new JPanel(); 
@@ -561,30 +580,30 @@ public class Main extends JFrame implements ActionListener {
 		panel_3.setLayout(new BoxLayout(panel_3, BoxLayout.Y_AXIS));
 		uiRenting.windowRef = this;
 		
-		JLabel lblNewLabel_22 = new JLabel("Book To Rent");
-		lblNewLabel_22.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(128, 128, 128)));
+		JLabel lblNewLabel_22 = new JLabel("Rent List");
+		lblNewLabel_22.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		lblNewLabel_22.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_22.setOpaque(true);
 		lblNewLabel_22.setForeground(new Color(27, 27, 27));
 		lblNewLabel_22.setBackground(new Color(255, 163, 26));
 		lblNewLabel_22.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_22.setBounds(171, 231, 105, 23);
+		lblNewLabel_22.setBounds(10, 269, 105, 20);
 		SearchRentPanel.add(lblNewLabel_22);
 		
 		JButton btnNewButton_5 = new JButton("ADD"); 
 		btnNewButton_5.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));uiRenting.btnAdd = btnNewButton_5;
 		btnNewButton_5.setBackground(new Color(255, 163, 26));
 		btnNewButton_5.setForeground(new Color(27, 27, 27));
-		btnNewButton_5.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_5.setBounds(250, 33, 89, 23);
+		btnNewButton_5.setFont(new Font("Tahoma", Font.BOLD, 10));
+		btnNewButton_5.setBounds(385, 166, 65, 23);
 		SearchRentPanel.add(btnNewButton_5);
 		
 		JButton btnNewButton_6 = new JButton("REMOVE"); 
 		btnNewButton_6.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_6.setBackground(new Color(255, 163, 26));
 		btnNewButton_6.setForeground(new Color(27, 27, 27));uiRenting.btnRemove = btnNewButton_6;
-		btnNewButton_6.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_6.setBounds(349, 387, 89, 36);
+		btnNewButton_6.setFont(new Font("Tahoma", Font.BOLD, 10));
+		btnNewButton_6.setBounds(386, 290, 65, 23);
 		SearchRentPanel.add(btnNewButton_6);
 		
 		JButton btnNewButton_7 = new JButton("CONFIRM"); 
@@ -612,6 +631,23 @@ public class Main extends JFrame implements ActionListener {
 		formattedTextField_3.setBounds(68, 396, 116, 20);
 		SearchRentPanel.add(formattedTextField_3);
 		
+		JLabel lblNewLabel_1_1 = new JLabel("Query");
+		lblNewLabel_1_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1_1.setForeground(new Color(255, 163, 26));
+		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblNewLabel_1_1.setBounds(143, -2, 176, 43);
+		SearchRentPanel.add(lblNewLabel_1_1);
+		
+		JLabel lblNewLabel_22_1 = new JLabel("Search List");
+		lblNewLabel_22_1.setOpaque(true);
+		lblNewLabel_22_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_22_1.setForeground(new Color(27, 27, 27));
+		lblNewLabel_22_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_22_1.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		lblNewLabel_22_1.setBackground(new Color(255, 163, 26));
+		lblNewLabel_22_1.setBounds(10, 144, 105, 20);
+		SearchRentPanel.add(lblNewLabel_22_1);
+		
 		JPanel ReturnPanel = new JPanel(); uiReturn.mainPanel = ReturnPanel;
 		ReturnPanel.setForeground(new Color(128, 128, 128));
 		ReturnPanel.setBackground(new Color(27, 27, 27));
@@ -625,19 +661,19 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_24.setOpaque(true);
 		lblNewLabel_24.setForeground(new Color(27, 27, 27));
 		lblNewLabel_24.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_24.setBounds(10, 21, 66, 20);
+		lblNewLabel_24.setBounds(10, 71, 66, 20);
 		ReturnPanel.add(lblNewLabel_24);
 		
 		
 		JFormattedTextField formattedTextField_2 = new JFormattedTextField(uiReturn.idFormatter); 
 		formattedTextField_2.setBorder(new MatteBorder(2, 2, 2, 2, (Color) new Color(255, 163, 26)));
 		formattedTextField_2.setBackground(new Color(128, 128, 128));uiReturn.ftfID = formattedTextField_2;
-		formattedTextField_2.setBounds(77, 21, 119, 20);
+		formattedTextField_2.setBounds(77, 71, 119, 20);
 		ReturnPanel.add(formattedTextField_2);
 		
 		JScrollPane scrollPane_3 = new JScrollPane();
 		scrollPane_3.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane_3.setBounds(10, 144, 440, 269);
+		scrollPane_3.setBounds(10, 144, 440, 222);
 		ReturnPanel.add(scrollPane_3);
 		
 		JPanel panel_4 = new JPanel(); 
@@ -649,15 +685,32 @@ public class Main extends JFrame implements ActionListener {
 		btnNewButton_8.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_8.setBackground(new Color(255, 163, 26));uiReturn.btnEnter = btnNewButton_8;
 		btnNewButton_8.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_8.setBounds(206, 19, 89, 23);
+		btnNewButton_8.setBounds(206, 69, 89, 23);
 		ReturnPanel.add(btnNewButton_8);
 		
 		JButton btnNewButton_9 = new JButton("RETURN"); 
 		btnNewButton_9.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_9.setBackground(new Color(255, 163, 26));uiReturn.btnReturn = btnNewButton_9;
 		btnNewButton_9.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_9.setBounds(361, 110, 89, 23);
+		btnNewButton_9.setBounds(10, 377, 89, 23);
 		ReturnPanel.add(btnNewButton_9);
+		
+		JLabel lblNewLabel_22_1_1 = new JLabel("Return List");
+		lblNewLabel_22_1_1.setOpaque(true);
+		lblNewLabel_22_1_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_22_1_1.setForeground(new Color(27, 27, 27));
+		lblNewLabel_22_1_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_22_1_1.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		lblNewLabel_22_1_1.setBackground(new Color(255, 163, 26));
+		lblNewLabel_22_1_1.setBounds(10, 123, 105, 20);
+		ReturnPanel.add(lblNewLabel_22_1_1);
+		
+		JLabel lblNewLabel_1_1_1 = new JLabel("Return");
+		lblNewLabel_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1_1_1.setForeground(new Color(255, 163, 26));
+		lblNewLabel_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblNewLabel_1_1_1.setBounds(157, 0, 176, 43);
+		ReturnPanel.add(lblNewLabel_1_1_1);
 		
 		JPanel UserInformationPanel = new JPanel(); uiUserInfo.mainPanel = UserInformationPanel;
 		UserInformationPanel.setBackground(new Color(27, 27, 27));
@@ -671,20 +724,20 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_25.setOpaque(true);
 		lblNewLabel_25.setForeground(new Color(27, 27, 27));
 		lblNewLabel_25.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_25.setBounds(10, 9, 104, 20);
+		lblNewLabel_25.setBounds(10, 44, 104, 20);
 		UserInformationPanel.add(lblNewLabel_25);
 		
 		JFormattedTextField formattedTextField_4 = new JFormattedTextField(uiReturn.idFormatter); 
-		formattedTextField_4.setBorder(new EtchedBorder(EtchedBorder.RAISED, new Color(128, 128, 128), null));
-		formattedTextField_4.setBackground(new Color(128, 128, 128));uiUserInfo.ftfID = formattedTextField_4;
-		formattedTextField_4.setBounds(124, 9, 181, 20);
+		formattedTextField_4.setBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(128, 128, 128), Color.LIGHT_GRAY));
+		formattedTextField_4.setBackground(Color.WHITE);uiUserInfo.ftfID = formattedTextField_4;
+		formattedTextField_4.setBounds(124, 44, 181, 20);
 		UserInformationPanel.add(formattedTextField_4);
 		
 		JButton btnNewButton_10 = new JButton("ENTER"); 
 		btnNewButton_10.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_10.setBackground(new Color(255, 163, 26));uiUserInfo.btnEnter = btnNewButton_10; uiUserInfo.initActionResponse();
 		btnNewButton_10.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_10.setBounds(347, 8, 89, 23);
+		btnNewButton_10.setBounds(315, 43, 89, 23);
 		UserInformationPanel.add(btnNewButton_10);
 		
 		JLabel lblNewLabel_26 = new JLabel("Name:");
@@ -694,7 +747,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_26.setOpaque(true);
 		lblNewLabel_26.setForeground(new Color(27, 27, 27));
 		lblNewLabel_26.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_26.setBounds(10, 40, 104, 20);
+		lblNewLabel_26.setBounds(10, 75, 104, 20);
 		UserInformationPanel.add(lblNewLabel_26);
 		
 		JLabel lblNewLabel_27 = new JLabel(""); 
@@ -702,7 +755,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_27.setBackground(new Color(128, 128, 128));uiUserInfo.tfName = lblNewLabel_27;
 		lblNewLabel_27.setOpaque(true);
 		lblNewLabel_27.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_27.setBounds(124, 40, 181, 20);
+		lblNewLabel_27.setBounds(124, 75, 181, 20);
 		UserInformationPanel.add(lblNewLabel_27);
 		
 		JLabel lblNewLabel_28 = new JLabel("Address:");
@@ -712,7 +765,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_28.setOpaque(true);
 		lblNewLabel_28.setForeground(new Color(27, 27, 27));
 		lblNewLabel_28.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_28.setBounds(10, 71, 104, 20);
+		lblNewLabel_28.setBounds(10, 106, 104, 20);
 		UserInformationPanel.add(lblNewLabel_28);
 		
 		JLabel lblNewLabel_29 = new JLabel("Email:");
@@ -722,7 +775,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_29.setOpaque(true);
 		lblNewLabel_29.setForeground(new Color(27, 27, 27));
 		lblNewLabel_29.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_29.setBounds(10, 102, 104, 20);
+		lblNewLabel_29.setBounds(10, 137, 104, 20);
 		UserInformationPanel.add(lblNewLabel_29);
 		
 		JLabel lblNewLabel_30 = new JLabel("Contact No.");
@@ -732,7 +785,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_30.setOpaque(true);
 		lblNewLabel_30.setForeground(new Color(27, 27, 27));
 		lblNewLabel_30.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_30.setBounds(10, 133, 104, 20);
+		lblNewLabel_30.setBounds(10, 168, 104, 20);
 		UserInformationPanel.add(lblNewLabel_30);
 		
 		JLabel lblNewLabel_31 = new JLabel("Gender:");
@@ -742,7 +795,7 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_31.setOpaque(true);
 		lblNewLabel_31.setForeground(new Color(27, 27, 27));
 		lblNewLabel_31.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_31.setBounds(10, 164, 104, 20);
+		lblNewLabel_31.setBounds(10, 199, 104, 20);
 		UserInformationPanel.add(lblNewLabel_31);
 		
 		JLabel lblNewLabel_32 = new JLabel("Role:");
@@ -752,51 +805,68 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_32.setOpaque(true);
 		lblNewLabel_32.setForeground(new Color(27, 27, 27));
 		lblNewLabel_32.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_32.setBounds(315, 164, 70, 20);
+		lblNewLabel_32.setBounds(315, 199, 70, 20);
 		UserInformationPanel.add(lblNewLabel_32);
 		
 		JLabel lblNewLabel_33 = new JLabel(""); 
 		lblNewLabel_33.setBorder(new EtchedBorder(EtchedBorder.RAISED, new Color(128, 128, 128), null));
 		lblNewLabel_33.setBackground(new Color(128, 128, 128));lblNewLabel_33.setOpaque(true); uiUserInfo.tfAddress = lblNewLabel_33;
-		lblNewLabel_33.setBounds(124, 71, 181, 20);
+		lblNewLabel_33.setBounds(124, 106, 181, 20);
 		UserInformationPanel.add(lblNewLabel_33);
 		
 		JLabel lblNewLabel_33_1 = new JLabel(""); 
 		lblNewLabel_33_1.setBorder(new EtchedBorder(EtchedBorder.RAISED, new Color(128, 128, 128), null));
 		lblNewLabel_33_1.setBackground(new Color(128, 128, 128));uiUserInfo.tfEmail = lblNewLabel_33_1;
 		lblNewLabel_33_1.setOpaque(true);
-		lblNewLabel_33_1.setBounds(124, 102, 181, 20);
+		lblNewLabel_33_1.setBounds(124, 137, 181, 20);
 		UserInformationPanel.add(lblNewLabel_33_1);
 		
 		JLabel lblNewLabel_33_1_1 = new JLabel(""); 
 		lblNewLabel_33_1_1.setBorder(new EtchedBorder(EtchedBorder.RAISED, new Color(128, 128, 128), null));
 		lblNewLabel_33_1_1.setBackground(new Color(128, 128, 128));uiUserInfo.tfContactNo = lblNewLabel_33_1_1;
 		lblNewLabel_33_1_1.setOpaque(true);
-		lblNewLabel_33_1_1.setBounds(124, 133, 181, 20);
+		lblNewLabel_33_1_1.setBounds(124, 168, 181, 20);
 		UserInformationPanel.add(lblNewLabel_33_1_1);
 		
 		JLabel lblNewLabel_33_1_2 = new JLabel(""); 
 		lblNewLabel_33_1_2.setBorder(new EtchedBorder(EtchedBorder.RAISED, new Color(128, 128, 128), null));
 		lblNewLabel_33_1_2.setBackground(new Color(128, 128, 128));uiUserInfo.tfGender = lblNewLabel_33_1_2;
 		lblNewLabel_33_1_2.setOpaque(true);
-		lblNewLabel_33_1_2.setBounds(124, 164, 181, 20);
+		lblNewLabel_33_1_2.setBounds(124, 199, 181, 20);
 		UserInformationPanel.add(lblNewLabel_33_1_2);
 		
 		JLabel lblNewLabel_33_1_3 = new JLabel(""); 
 		lblNewLabel_33_1_3.setBorder(new EtchedBorder(EtchedBorder.RAISED, new Color(128, 128, 128), null));
 		lblNewLabel_33_1_3.setBackground(new Color(128, 128, 128));uiUserInfo.tfRole = lblNewLabel_33_1_3;
 		lblNewLabel_33_1_3.setOpaque(true);
-		lblNewLabel_33_1_3.setBounds(395, 164, 55, 20);
+		lblNewLabel_33_1_3.setBounds(395, 199, 55, 20);
 		UserInformationPanel.add(lblNewLabel_33_1_3);
 		
 		JScrollPane scrollPane_4 = new JScrollPane();
-		scrollPane_4.setBounds(10, 195, 440, 218);
+		scrollPane_4.setBounds(10, 251, 440, 162);
 		UserInformationPanel.add(scrollPane_4);
 		
 		JPanel panel_5 = new JPanel(); 
 		panel_5.setBackground(new Color(128, 128, 128));uiUserInfo.panel = panel_5;
 		scrollPane_4.setViewportView(panel_5);
 		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
+		
+		JLabel lblNewLabel_1_1_2 = new JLabel("User Info");
+		lblNewLabel_1_1_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1_1_2.setForeground(new Color(255, 163, 26));
+		lblNewLabel_1_1_2.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblNewLabel_1_1_2.setBounds(146, 0, 176, 43);
+		UserInformationPanel.add(lblNewLabel_1_1_2);
+		
+		JLabel lblNewLabel_22_1_1_1 = new JLabel("Rent List");
+		lblNewLabel_22_1_1_1.setOpaque(true);
+		lblNewLabel_22_1_1_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_22_1_1_1.setForeground(new Color(27, 27, 27));
+		lblNewLabel_22_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_22_1_1_1.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		lblNewLabel_22_1_1_1.setBackground(new Color(255, 163, 26));
+		lblNewLabel_22_1_1_1.setBounds(10, 230, 105, 20);
+		UserInformationPanel.add(lblNewLabel_22_1_1_1);
 		
 		JPanel UserManagementPanel = new JPanel(); uiUserManagement.mainPanel = UserManagementPanel;
 		UserManagementPanel.setBackground(new Color(27, 27, 27));
@@ -810,12 +880,12 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_3.setOpaque(true);
 		lblNewLabel_3.setForeground(new Color(27, 27, 27));
 		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblNewLabel_3.setBounds(10, 8, 78, 20);
+		lblNewLabel_3.setBounds(10, 83, 78, 20);
 		UserManagementPanel.add(lblNewLabel_3);
 		
 		JFormattedTextField fTFieldUsermngUserID = new JFormattedTextField(this.maskFUserID); uiUserManagement.ftfID = fTFieldUsermngUserID;
 		fTFieldUsermngUserID.setBackground(new Color(128, 128, 128));
-		fTFieldUsermngUserID.setBounds(89, 8, 122, 20);
+		fTFieldUsermngUserID.setBounds(89, 83, 122, 20);
 		UserManagementPanel.add(fTFieldUsermngUserID);
 		
 		JLabel lblNewLabel_4 = new JLabel("User Name");
@@ -825,12 +895,12 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_4.setOpaque(true);
 		lblNewLabel_4.setForeground(new Color(27, 27, 27));
 		lblNewLabel_4.setFont(new Font("Tahoma", Font.BOLD, 11));
-		lblNewLabel_4.setBounds(10, 32, 78, 20);
+		lblNewLabel_4.setBounds(10, 107, 78, 20);
 		UserManagementPanel.add(lblNewLabel_4);
 		
 		JTextField tFieldUsermngUserName = new JTextField(); uiUserManagement.tfName = tFieldUsermngUserName;
 		tFieldUsermngUserName.setBackground(new Color(128, 128, 128));
-		tFieldUsermngUserName.setBounds(89, 32, 122, 20);
+		tFieldUsermngUserName.setBounds(89, 107, 122, 20);
 		UserManagementPanel.add(tFieldUsermngUserName);
 		tFieldUsermngUserName.setColumns(10);
 		
@@ -838,7 +908,7 @@ public class Main extends JFrame implements ActionListener {
 		btnUsermngSearch.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngSearch.setBackground(new Color(255, 163, 26));
 		btnUsermngSearch.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngSearch.setBounds(221, 3, 114, 29);
+		btnUsermngSearch.setBounds(221, 82, 114, 21);
 		btnUsermngSearch.addActionListener(this);
 		UserManagementPanel.add(btnUsermngSearch);
 		
@@ -853,7 +923,7 @@ public class Main extends JFrame implements ActionListener {
 		JScrollPane scrollPane = new JScrollPane(scrPanelUsermng); uiUserManagement.scrollPane = scrollPane;
 		scrollPane.setViewportBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBounds(10, 106, 440, 307);
+		scrollPane.setBounds(10, 169, 440, 211);
 		UserManagementPanel.add(scrollPane);
 		scrollPane.setViewportView(scrPanelUsermng);
 		scrPanelUsermng.setLayout(new BoxLayout(scrPanelUsermng, BoxLayout.Y_AXIS));
@@ -862,7 +932,7 @@ public class Main extends JFrame implements ActionListener {
 		btnUsermngUnregis.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngUnregis.setBackground(new Color(255, 163, 26));
 		btnUsermngUnregis.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngUnregis.setBounds(10, 72, 115, 29);
+		btnUsermngUnregis.setBounds(10, 391, 115, 29);
 		btnUsermngUnregis.addActionListener(this);
 		UserManagementPanel.add(btnUsermngUnregis);
 		
@@ -870,9 +940,26 @@ public class Main extends JFrame implements ActionListener {
 		btnUsermngShowAll.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnUsermngShowAll.setBackground(new Color(255, 163, 26));
 		btnUsermngShowAll.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnUsermngShowAll.setBounds(346, 3, 114, 29);
+		btnUsermngShowAll.setBounds(145, 391, 114, 29);
 		btnUsermngShowAll.addActionListener(this);
 		UserManagementPanel.add(btnUsermngShowAll);
+		
+		JLabel lblNewLabel_22_1_1_2 = new JLabel("Search List");
+		lblNewLabel_22_1_1_2.setOpaque(true);
+		lblNewLabel_22_1_1_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_22_1_1_2.setForeground(new Color(27, 27, 27));
+		lblNewLabel_22_1_1_2.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_22_1_1_2.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		lblNewLabel_22_1_1_2.setBackground(new Color(255, 163, 26));
+		lblNewLabel_22_1_1_2.setBounds(10, 149, 105, 20);
+		UserManagementPanel.add(lblNewLabel_22_1_1_2);
+		
+		JLabel lblNewLabel_1_1_2_1 = new JLabel("User Management");
+		lblNewLabel_1_1_2_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1_1_2_1.setForeground(new Color(255, 163, 26));
+		lblNewLabel_1_1_2_1.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblNewLabel_1_1_2_1.setBounds(133, 11, 221, 43);
+		UserManagementPanel.add(lblNewLabel_1_1_2_1);
 		//scrPanelUsermng.setBounds(scrollPane.getBounds());
 		
 		
@@ -888,7 +975,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		
 		JScrollPane scrollPaneBookMng = new JScrollPane(panel_1); bookManagmentUI.scrollPane = scrollPaneBookMng;
-		scrollPaneBookMng.setBounds(10, 149, 440, 263);
+		scrollPaneBookMng.setBounds(10, 218, 440, 163);
 		BookManagementPanel.add(scrollPaneBookMng);
 		
 		
@@ -903,13 +990,13 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_5.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_5.setForeground(new Color(27, 27, 27));
 		lblNewLabel_5.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_5.setBounds(10, 32, 82, 20);
+		lblNewLabel_5.setBounds(10, 79, 82, 20);
 		BookManagementPanel.add(lblNewLabel_5);
 		
 		JFormattedTextField formattedTextField = new JFormattedTextField(bookManagmentUI.idFormatter); 
 		formattedTextField.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		formattedTextField.setBackground(new Color(128, 128, 128));bookManagmentUI.ftfID = formattedTextField;
-		formattedTextField.setBounds(93, 32, 132, 20);
+		formattedTextField.setBounds(93, 79, 132, 20);
 		BookManagementPanel.add(formattedTextField);
 		
 		JLabel lblBookMgnName = new JLabel("Name");
@@ -919,13 +1006,13 @@ public class Main extends JFrame implements ActionListener {
 		lblBookMgnName.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBookMgnName.setForeground(new Color(27, 27, 27));
 		lblBookMgnName.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblBookMgnName.setBounds(10, 5, 82, 20);
+		lblBookMgnName.setBounds(10, 52, 82, 20);
 		BookManagementPanel.add(lblBookMgnName);
 		
 		JTextField txtFieldNameBookMng = new JTextField(); 
 		txtFieldNameBookMng.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		txtFieldNameBookMng.setBackground(new Color(128, 128, 128));bookManagmentUI.tfName = txtFieldNameBookMng;
-		txtFieldNameBookMng.setBounds(93, 5, 132, 20);
+		txtFieldNameBookMng.setBounds(93, 52, 132, 20);
 		BookManagementPanel.add(txtFieldNameBookMng);
 		txtFieldNameBookMng.setColumns(10);
 		
@@ -936,13 +1023,13 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_16.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_16.setForeground(new Color(27, 27, 27));
 		lblNewLabel_16.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_16.setBounds(10, 59, 82, 21);
+		lblNewLabel_16.setBounds(10, 106, 82, 21);
 		BookManagementPanel.add(lblNewLabel_16);
 		
 		textField_1 = new JTextField(); 
 		textField_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		textField_1.setBackground(new Color(128, 128, 128));bookManagmentUI.tfCategory = textField_1;
-		textField_1.setBounds(93, 59, 132, 21);
+		textField_1.setBounds(93, 106, 132, 21);
 		BookManagementPanel.add(textField_1);
 		textField_1.setColumns(10);
 		
@@ -953,13 +1040,13 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_17.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_17.setForeground(new Color(27, 27, 27));
 		lblNewLabel_17.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_17.setBounds(10, 89, 82, 20);
+		lblNewLabel_17.setBounds(10, 136, 82, 20);
 		BookManagementPanel.add(lblNewLabel_17);
 		
 		textField_2 = new JTextField(); 
 		textField_2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		textField_2.setBackground(new Color(128, 128, 128));bookManagmentUI.tfAuthor = textField_2;
-		textField_2.setBounds(93, 89, 132, 20);
+		textField_2.setBounds(93, 136, 132, 20);
 		BookManagementPanel.add(textField_2);
 		textField_2.setColumns(10);
 		
@@ -970,34 +1057,34 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_18.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_18.setForeground(new Color(27, 27, 27));
 		lblNewLabel_18.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_18.setBounds(10, 117, 82, 20);
+		lblNewLabel_18.setBounds(10, 164, 82, 20);
 		BookManagementPanel.add(lblNewLabel_18);
 		
 		JFormattedTextField formattedTextField_1 = new JFormattedTextField(bookManagmentUI.yearFormatter); 
 		formattedTextField_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		formattedTextField_1.setBackground(new Color(128, 128, 128));bookManagmentUI.ftfYear = formattedTextField_1;
-		formattedTextField_1.setBounds(93, 117, 132, 20);
+		formattedTextField_1.setBounds(93, 164, 132, 20);
 		BookManagementPanel.add(formattedTextField_1);
 		
 		JButton btnNewButton = new JButton("CREATE"); 
 		btnNewButton.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton.setBackground(new Color(255, 163, 26));bookManagmentUI.btnCreate = btnNewButton;
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton.setBounds(235, 4, 89, 23);
+		btnNewButton.setBounds(235, 163, 89, 23);
 		BookManagementPanel.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("DELETE"); 
 		btnNewButton_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_1.setBackground(new Color(255, 163, 26));bookManagmentUI.btnDelete = btnNewButton_1;
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_1.setBounds(346, 4, 89, 23);
+		btnNewButton_1.setBounds(10, 392, 89, 23);
 		BookManagementPanel.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("SEARCH"); 
 		btnNewButton_2.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_2.setBackground(new Color(255, 163, 26));bookManagmentUI.btnSearch = btnNewButton_2;
 		btnNewButton_2.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_2.setBounds(237, 39, 89, 23);
+		btnNewButton_2.setBounds(235, 51, 89, 23);
 		BookManagementPanel.add(btnNewButton_2);
 		
 		JLabel lblNewLabel_19 = new JLabel("QTY:"); 
@@ -1007,29 +1094,46 @@ public class Main extends JFrame implements ActionListener {
 		lblNewLabel_19.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_19.setForeground(new Color(27, 27, 27));
 		lblNewLabel_19.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblNewLabel_19.setBounds(235, 117, 46, 21);
+		lblNewLabel_19.setBounds(225, 394, 46, 21);
 		BookManagementPanel.add(lblNewLabel_19);
 		
 		JButton btnNewButton_3 = new JButton("ADD"); 
 		btnNewButton_3.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_3.setBackground(new Color(255, 163, 26));bookManagmentUI.btnAdd = btnNewButton_3;
 		btnNewButton_3.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_3.setBounds(292, 117, 82, 20);
+		btnNewButton_3.setBounds(282, 394, 82, 21);
 		BookManagementPanel.add(btnNewButton_3);
 		
 		JButton btnNewButton_3_1 = new JButton("SUB"); 
 		btnNewButton_3_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		btnNewButton_3_1.setBackground(new Color(255, 163, 26));bookManagmentUI.btnSubtract = btnNewButton_3_1;
 		btnNewButton_3_1.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_3_1.setBounds(378, 117, 82, 20);
+		btnNewButton_3_1.setBounds(368, 394, 82, 21);
 		BookManagementPanel.add(btnNewButton_3_1);
 		
 		JButton btnNewButton_11 = new JButton("ALL"); 
 		btnNewButton_11.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));bookManagmentUI.btnShowAll = btnNewButton_11;
 		btnNewButton_11.setBackground(new Color(255, 163, 26));
 		btnNewButton_11.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnNewButton_11.setBounds(237, 70, 87, 23);
+		btnNewButton_11.setBounds(235, 78, 89, 23);
 		BookManagementPanel.add(btnNewButton_11);
+		
+		JLabel lblNewLabel_1_1_2_2 = new JLabel("Book Management");
+		lblNewLabel_1_1_2_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1_1_2_2.setForeground(new Color(255, 163, 26));
+		lblNewLabel_1_1_2_2.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblNewLabel_1_1_2_2.setBounds(132, 0, 218, 43);
+		BookManagementPanel.add(lblNewLabel_1_1_2_2);
+		
+		JLabel lblNewLabel_22_1_1_2_1 = new JLabel("Search List");
+		lblNewLabel_22_1_1_2_1.setOpaque(true);
+		lblNewLabel_22_1_1_2_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_22_1_1_2_1.setForeground(new Color(27, 27, 27));
+		lblNewLabel_22_1_1_2_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel_22_1_1_2_1.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		lblNewLabel_22_1_1_2_1.setBackground(new Color(255, 163, 26));
+		lblNewLabel_22_1_1_2_1.setBounds(10, 198, 105, 20);
+		BookManagementPanel.add(lblNewLabel_22_1_1_2_1);
 		
 		RegisterPanel = new JPanel(); uiUserRegis.mainPanel = RegisterPanel;
 		RegisterPanel.setForeground(new Color(255, 255, 255));
@@ -1228,6 +1332,6 @@ public class Main extends JFrame implements ActionListener {
 		uiReturn.initActionResponse();
 		uiLogin.initActionListener();
 		uiUserManagement.initActionListener();
-		
+			
 	}
 }

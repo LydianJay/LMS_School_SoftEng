@@ -233,7 +233,7 @@ public class UIUserManagement implements ActionListener, ComponentResize{
 	public void resizeCall(Dimension old, Dimension n) {
 		
 		double rX = n.getWidth() / old.getWidth();
-		double rY = n.getWidth() / old.getWidth();
+		double rY = n.getHeight() / old.getHeight();
 		
 
 		
