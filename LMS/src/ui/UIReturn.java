@@ -121,6 +121,7 @@ public class UIReturn implements ActionListener, ComponentResize{
 	               JOptionPane.YES_NO_OPTION,
 	               JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) return;
 		
+		int count = 0;
 		boolean success = true;
 		try {
 			String userID = ftfID.getText();
@@ -135,6 +136,7 @@ public class UIReturn implements ActionListener, ComponentResize{
 					st.executeUpdate(stm);
 					String stm2 = "UPDATE bookinfo SET bookQTY = bookQTY + 1 WHERE bookID = " + bookID + ";";
 					st.executeUpdate(stm2);
+					count++;
 				}
 				
 			}
@@ -145,7 +147,10 @@ public class UIReturn implements ActionListener, ComponentResize{
 			s.printStackTrace();
 			success = false;
 		}
-		if(success) JOptionPane.showMessageDialog(windowRef, "Returned Successfuly!"); else JOptionPane.showMessageDialog(windowRef, "Return was not successful!");
+		if(count <= 0)
+			JOptionPane.showMessageDialog(windowRef, "No books selected!");
+		else
+			if(success) JOptionPane.showMessageDialog(windowRef, "Returned Successfuly!"); else JOptionPane.showMessageDialog(windowRef, "Return was not successful!");
 		
 		ftfID.setText("");
 		
@@ -167,7 +172,7 @@ public class UIReturn implements ActionListener, ComponentResize{
 	public void resizeCall(Dimension old, Dimension n) {
 		
 		double rX = n.getWidth() / old.getWidth();
-		double rY = n.getWidth() / old.getWidth();
+		double rY = n.getHeight() / old.getHeight();
 		
 
 		
